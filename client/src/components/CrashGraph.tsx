@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { getCrashGraphHeight } from "@/lib/game-logic";
 import { useSound } from "@/contexts/SoundContext";
@@ -13,12 +13,25 @@ interface CrashGraphProps {
   waitingCountdown?: number;
 }
 
-// Оптимизированный компонент CrashGraph с мемоизацией
-const CrashGraph = memo(({ multiplier, isLive, hasCrashed, waitingForBets, waitingCountdown }: CrashGraphProps) => {
+// Оптимизированный компонент CrashGraph
+const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCountdown }: CrashGraphProps) => {
   const [height, setHeight] = useState(0);
   const [starPosition, setStarPosition] = useState(100); // Position from the bottom (%)
+  const [displayMultiplier, setDisplayMultiplier] = useState(1.00); // Отдельное состояние для отображения
   const animationFrameRef = useRef<number>();
   const { playSound } = useSound();
+  
+  // Обновление отображаемого коэффициента
+  useEffect(() => {
+    if (isLive && !hasCrashed) {
+      setDisplayMultiplier(multiplier);
+    } else if (hasCrashed) {
+      // Сохраняем последний множитель для экрана краша
+    } else if (!isLive && !hasCrashed) {
+      // Сбрасываем до 0.00 когда игра завершилась и начинается новая
+      setDisplayMultiplier(0.00);
+    }
+  }, [multiplier, isLive, hasCrashed]);
   
   // Эффект для анимации звезды и линии графика (оптимизированный)
   useEffect(() => {
@@ -109,7 +122,7 @@ const CrashGraph = memo(({ multiplier, isLive, hasCrashed, waitingForBets, waiti
           className="absolute left-1/2 transform -translate-x-1/2 transition-all"
           style={{ 
             bottom: `${Math.min(50, starPosition)}%`,
-            filter: `drop-shadow(0 0 ${Math.min(15, 5 + multiplier/3)}px rgba(255, 215, 0, 0.6))`,
+            filter: `drop-shadow(0 0 ${Math.min(15, 5 + displayMultiplier/3)}px rgba(255, 215, 0, 0.6))`,
             zIndex: 10,
             transition: 'bottom 0.15s ease-out'
           }}
@@ -117,9 +130,9 @@ const CrashGraph = memo(({ multiplier, isLive, hasCrashed, waitingForBets, waiti
           <div className="relative flex flex-col items-center">
             {/* Звезда */}
             <div 
-              className={`relative ${multiplier >= 2 ? 'animate-subtle-wobble' : ''}`}
+              className={`relative ${displayMultiplier >= 2 ? 'animate-subtle-wobble' : ''}`}
               style={{
-                transform: `scale(${Math.min(1.5, 1 + multiplier/15)})`,
+                transform: `scale(${Math.min(1.5, 1 + displayMultiplier/15)})`,
               }}
             >
               {/* Свечение */}
@@ -141,12 +154,12 @@ const CrashGraph = memo(({ multiplier, isLive, hasCrashed, waitingForBets, waiti
               style={{
                 color: '#FFDE30',
                 textShadow: '0 0 10px rgba(255, 215, 0, 0.7)',
-                fontSize: Math.min(28, 18 + (multiplier / 2)) + 'px',
-                fontWeight: multiplier >= 2 ? 'bold' : 'normal',
+                fontSize: Math.min(28, 18 + (displayMultiplier / 2)) + 'px',
+                fontWeight: displayMultiplier >= 2 ? 'bold' : 'normal',
                 transition: 'all 0.1s ease-out'
               }}
             >
-              {multiplier.toFixed(2)}x
+              {displayMultiplier.toFixed(2)}x
             </div>
           </div>
         </div>
@@ -163,7 +176,7 @@ const CrashGraph = memo(({ multiplier, isLive, hasCrashed, waitingForBets, waiti
             {/* Текст */}
             <div className="bg-red-600 px-8 py-5 rounded-lg font-pixel text-white z-50 relative animate-shake border-2 border-yellow-500">
               <span className="text-2xl font-bold block text-center mb-1">CRASHED!</span>
-              <span className="block text-3xl font-bold text-yellow-300 text-center">{multiplier.toFixed(2)}x</span>
+              <span className="block text-3xl font-bold text-yellow-300 text-center">{displayMultiplier.toFixed(2)}x</span>
             </div>
           </div>
         </div>
@@ -184,8 +197,6 @@ const CrashGraph = memo(({ multiplier, isLive, hasCrashed, waitingForBets, waiti
       )}
     </div>
   );
-});
-
-CrashGraph.displayName = "CrashGraph";
+};
 
 export default CrashGraph;
