@@ -19,6 +19,7 @@ interface BetControlsProps {
   isLoading?: boolean;
   variant?: "primary" | "secondary";
   waitingCountdown?: number; // Добавляем обратный отсчет для отображения на кнопке
+  onAutoCashoutEnabledChange?: (enabled: boolean) => void; // Callback для передачи состояния включен/выключен в родительский компонент
 }
 
 const BetControls = ({
@@ -33,7 +34,8 @@ const BetControls = ({
   isSubmitDisabled = false,
   isLoading = false,
   variant = "primary",
-  waitingCountdown
+  waitingCountdown,
+  onAutoCashoutEnabledChange
 }: BetControlsProps) => {
   const [betInput, setBetInput] = useState(betAmount.toString());
   const [secondaryInput, setSecondaryInput] = useState(
