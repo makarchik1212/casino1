@@ -319,30 +319,33 @@
     animation: pulse-live 0.8s infinite;
   }
   
-  /* Новые стили для таймера как на скриншоте */
-  .timer-container {
+  /* Стили для кнопки с обратным отсчетом */
+  .countdown-button {
+    position: relative;
+    overflow: hidden;
+    animation: pulse-countdown 1s infinite ease-in-out;
+  }
+
+  @keyframes pulse-countdown {
+    0% { box-shadow: 0 0 0 0 rgba(255, 213, 0, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(255, 213, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 213, 0, 0); }
+  }
+  
+  .countdown-button::before {
+    content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(to right, rgba(255, 213, 0, 0.7), rgba(255, 153, 0, 0.9));
+    animation: countdown-line 10s linear;
+    animation-fill-mode: forwards;
+    border-radius: 0 0 3px 3px;
   }
   
-  .timer-value {
-    font-size: 4rem;
-    font-weight: bold;
-    color: white;
-    text-shadow: 0 0 10px rgba(100, 149, 237, 0.5);
-    font-family: 'Press Start 2P', monospace;
-  }
-  
-  .timer-label {
-    color: rgb(100, 149, 237);
-    margin-top: 0.5rem;
-    font-size: 1rem;
+  @keyframes countdown-line {
+    0% { width: 100%; }
+    100% { width: 0%; }
   }
 }

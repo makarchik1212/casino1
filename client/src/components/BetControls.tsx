@@ -177,7 +177,7 @@ const BetControls = ({
       <div className="col-span-2 mt-2">
         <PixelButton
           variant={variant}
-          className="w-full py-3 font-pixel text-lg uppercase"
+          className={`w-full py-3 font-pixel text-lg uppercase ${submitLabel.includes("(") ? "countdown-button" : ""}`}
           onClick={handleSubmit}
           disabled={isSubmitDisabled || isLoading}
         >

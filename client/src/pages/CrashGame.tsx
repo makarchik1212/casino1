@@ -48,18 +48,17 @@ const CrashGame = () => {
         // Update multiplier and game state
         setCurrentMultiplier(gameState.currentMultiplier);
         
-        // Check if we're in the waiting period between games
-        if (gameState.waitingForBets) {
+        // Всегда обновляем информацию о таймере если она есть
+        if (gameState.waitingCountdown !== undefined) {
           setWaitingForBets(true);
-          setIsLive(false);
-          setHasCrashed(false);
-          
-          if (gameState.waitingCountdown !== undefined) {
-            setWaitingCountdown(gameState.waitingCountdown);
-          }
+          setWaitingCountdown(gameState.waitingCountdown);
+        } else {
+          setWaitingForBets(false);
+          setWaitingCountdown(undefined);
         }
+        
         // Check if game is live
-        else if (gameState.currentCrashGame && !gameState.currentCrashGame.hasEnded) {
+        if (gameState.currentCrashGame && !gameState.currentCrashGame.hasEnded) {
           setWaitingForBets(false);
           setWaitingCountdown(undefined);
           setIsLive(true);
@@ -365,7 +364,9 @@ const CrashGame = () => {
               onSecondaryChange={setAutoCashoutAt}
               secondaryLabel="AUTO CASHOUT AT"
               secondarySuffix="X"
-              submitLabel={currentBet && isLive ? `CASHOUT ${Math.floor(currentBet.betAmount * currentMultiplier)} (+${Math.floor(currentBet.betAmount * currentMultiplier - currentBet.betAmount)})` : "PLACE BET"}
+              submitLabel={currentBet && isLive 
+                ? `CASHOUT ${Math.floor(currentBet.betAmount * currentMultiplier)} (+${Math.floor(currentBet.betAmount * currentMultiplier - currentBet.betAmount)})` 
+                : waitingForBets && waitingCountdown ? `PLACE BET (${waitingCountdown})` : "PLACE BET"}
               onSubmit={currentBet && isLive ? handleCashout : handlePlaceBet}
               isSubmitDisabled={
                 (currentBet && (!isLive || hasCrashed)) || 

@@ -274,17 +274,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         </div>
       )}
       
-      {/* Таймер в стиле скриншота - показываем или между играми или после краша, если есть таймер */}
-      {((!isLive && !hasCrashed) || (hasCrashed && waitingCountdown !== undefined)) && (
-        <div className="timer-container">
-          <div className="timer-value">
-            {countdown ? countdown.toFixed(1) : "0.0"}
-          </div>
-          <div className="timer-label">
-            Before the start
-          </div>
-        </div>
-      )}
+      {/* Таймер удален, теперь отображается на кнопке ставки */}
     </div>
   );
 };
