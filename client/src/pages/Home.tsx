@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import GameCard from "@/components/GameCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import crashGameCard from "@/assets/images/crash-game-card.png";
 
 const Home = () => {
   const { user } = useAuth();
@@ -29,7 +30,7 @@ const Home = () => {
             title="CRASH GAME"
             description="Bet before the line crashes for big multipliers!"
             multiplierRange="1.5x - 100x"
-            imageSrc="https://images.pexels.com/photos/2260821/pexels-photo-2260821.jpeg"
+            imageSrc={crashGameCard}
             path="/crash"
             isHot={true}
             buttonVariant="primary"
