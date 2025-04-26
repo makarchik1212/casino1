@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: 0 85% 60%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 120 72% 50%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 48 100% 47%;
+  --accent-foreground: 240 10% 3.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 240 4.9% 83.9%;
+  --radius: 0;
+  
+  /* UI specific */
+  --ui-dark: 240 5% 16%;
+  --ui-medium: 240 5% 24%;
+  
+  /* Game specific colors */
+  --success: 130 72% 50%;
+  --danger: 0 84.2% 60.2%;
+  
+  /* Chart colors */
+  --chart-1: 0 85% 60%;
+  --chart-2: 120 72% 50%;
+  --chart-3: 48 100% 47%;
+  --chart-4: 240 50% 50%;
+  --chart-5: 180 50% 50%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    image-rendering: pixelated;
+  }
+
+  body {
+    @apply bg-dark text-foreground font-pixelText;
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    );
+    background-size: 8px 8px;
+  }
+  
+  /* Custom button styling */
+  .pixel-btn {
+    @apply relative transition-all duration-100;
+    box-shadow: 0 4px 0 theme('colors.ui-dark'), 0 5px 0 #000;
+  }
+
+  .pixel-btn:active {
+    @apply top-1;
+    box-shadow: 0 1px 0 #000;
+  }
+  
+  /* Custom border styling */
+  .pixel-border {
+    box-shadow: 0 0 0 2px theme('colors.ui-dark'), 0 0 0 4px theme('colors.ui-medium');
+  }
+
+  /* Animations */
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .blink {
+    animation: blink 1s steps(1) infinite;
+  }
+  
+  /* Crash graph styling */
+  .crash-graph {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crash-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background: linear-gradient(transparent, rgba(255, 87, 87, 0.3));
+    clip-path: polygon(0 100%, 100% 0, 100% 100%);
+  }
+  
+  /* Mines grid styling */
+  .mine-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+
+  .mine-cell {
+    aspect-ratio: 1/1;
+    transition: all 0.2s;
+  }
+  
+  /* Coin sprite animation */
+  .coin-sprite {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-color: theme('colors.accent');
+    border-radius: 50%;
+    position: relative;
+  }
+
+  .coin-sprite::after {
+    content: "$";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    color: theme('colors.dark');
+  }
+  
+  @keyframes spin-slow {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+  }
+  
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+  
+  @keyframes coin-flip {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(180deg); }
+  }
+  
+  .animate-coin-flip {
+    animation: coin-flip 1s ease-in-out;
+  }
+}
