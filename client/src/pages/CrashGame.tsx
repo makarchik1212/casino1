@@ -65,8 +65,8 @@ const CrashGame = () => {
           setIsLive(true);
           setHasCrashed(false);
           
-          // Auto cashout if threshold is reached and we have a bet
-          if (currentBet && autoCashoutAt && gameState.currentMultiplier >= autoCashoutAt) {
+          // Auto cashout if threshold is reached, we have a bet, and auto-cashout is enabled
+          if (currentBet && autoCashoutAt && isAutoCashoutEnabled && gameState.currentMultiplier >= autoCashoutAt) {
             handleCashout();
           }
         } else if (gameState.gameHistory && gameState.gameHistory.length > 0) {
@@ -133,7 +133,7 @@ const CrashGame = () => {
     return () => {
       clearInterval(pollInterval);
     };
-  }, [currentBet, autoCashoutAt, isLive, hasCrashed, recentResults, toast]);
+  }, [currentBet, autoCashoutAt, isAutoCashoutEnabled, isLive, hasCrashed, recentResults, toast]);
   
   // Use for loading state only
   const [isLoadingGame, setIsLoadingGame] = useState(true);
@@ -378,6 +378,8 @@ const CrashGame = () => {
               isLoading={isBetting || isCashingOut}
               variant={currentBet && isLive ? "secondary" : "primary"}
               waitingCountdown={waitingCountdown}
+              isAutoCashoutEnabled={isAutoCashoutEnabled}
+              onAutoCashoutEnabledChange={setIsAutoCashoutEnabled}
             />
           </PixelCard>
         </div>
