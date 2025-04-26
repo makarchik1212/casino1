@@ -75,7 +75,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/game-state", async (req, res) => {
     try {
       // Получаем активные ставки для текущей игры
-      let activeBets = [];
+      let activeBets: Array<any> = [];
       const currentGame = await storage.getCurrentCrashGame();
       
       if (currentGame) {

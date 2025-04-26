@@ -21,7 +21,7 @@ const CrashBetList = ({ bets, currentMultiplier }: CrashBetListProps) => {
   if (!bets || bets.length === 0) {
     return (
       <div className="w-full py-4 text-center text-gray-500 font-pixel">
-        Ожидание ставок игроков...
+        Waiting for players to place bets...
       </div>
     );
   }
@@ -31,9 +31,9 @@ const CrashBetList = ({ bets, currentMultiplier }: CrashBetListProps) => {
       <table className="w-full border-collapse">
         <thead className="bg-ui-dark sticky top-0 z-10">
           <tr>
-            <th className="text-left p-2 font-pixel text-xs text-gray-400">Игрок</th>
-            <th className="text-center p-2 font-pixel text-xs text-gray-400">Ставка</th>
-            <th className="text-right p-2 font-pixel text-xs text-gray-400">Выигрыш</th>
+            <th className="text-left p-2 font-pixel text-xs text-gray-400">PLAYER</th>
+            <th className="text-center p-2 font-pixel text-xs text-gray-400">BET</th>
+            <th className="text-right p-2 font-pixel text-xs text-gray-400">PAYOUT</th>
           </tr>
         </thead>
         <tbody>
@@ -51,12 +51,12 @@ const CrashBetList = ({ bets, currentMultiplier }: CrashBetListProps) => {
                 className={cn(
                   "border-b border-ui-medium transition-colors",
                   isCashedOut && "bg-gray-900/50",
-                  isCashedOut && "opacity-70"
+                  isCashedOut && "opacity-75"
                 )}
               >
                 <td className="p-2 flex items-center gap-2">
                   <div 
-                    className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-gray-200"
+                    className="w-7 h-7 rounded-full flex items-center justify-center font-medium text-gray-200 text-xs"
                     style={{ backgroundColor: bet.avatarColor }}
                   >
                     {getUserInitials(bet.username)}
@@ -64,7 +64,7 @@ const CrashBetList = ({ bets, currentMultiplier }: CrashBetListProps) => {
                   <span className="font-pixel text-sm text-gray-200">{bet.username}</span>
                 </td>
                 <td className="p-2 text-center">
-                  <span className="font-pixel text-sm text-gray-200">{bet.betAmount}</span>
+                  <span className="font-pixel text-sm text-gray-300">{bet.betAmount}</span>
                 </td>
                 <td className="p-2 text-right">
                   {isCashedOut ? (
@@ -77,8 +77,8 @@ const CrashBetList = ({ bets, currentMultiplier }: CrashBetListProps) => {
                       </span>
                     </div>
                   ) : (
-                    <div className="font-pixel text-sm text-gray-200 animate-pulse-slow">
-                      {winAmount} (+{profit})
+                    <div className="font-pixel text-sm text-gray-300 animate-pulse-soft">
+                      <span className="text-yellow-400">{winAmount}</span> (<span className="text-green-400">+{profit}</span>)
                     </div>
                   )}
                 </td>
