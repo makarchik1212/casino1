@@ -81,11 +81,17 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
       setShowExplosion(false);
     } else if (hasCrashed) {
       // Звук краша
-      playSound(crashSound);
+      try {
+        playSound(crashSound);
+      } catch (error) {
+        console.log("Не удалось воспроизвести звук краша", error);
+      }
       
-      // Активируем эффекты взрыва
-      setShowExplosion(true);
-      setRedGlow(true);
+      // Активируем эффекты взрыва с небольшой задержкой, чтобы синхронизировать с другими эффектами
+      setTimeout(() => {
+        setShowExplosion(true);
+        setRedGlow(true);
+      }, 50);
     }
     
     // Очистка
@@ -94,7 +100,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [multiplier, isLive, hasCrashed, height]);
+  }, [multiplier, isLive, hasCrashed]);
   
   // Сброс позиций при окончании игры
   useEffect(() => {
