@@ -109,6 +109,11 @@ const CrashGame = () => {
               }
             }
             
+            // Сразу сбрасываем коэффициент до 1.0 после краша для нового раунда
+            setTimeout(() => {
+              setCurrentMultiplier(1.0);
+            }, 1500); // Небольшая задержка чтобы увидеть краш-коэффициент
+            
             // Если есть информация об обратном отсчете, показываем ее сразу
             if (gameState.waitingCountdown !== undefined) {
               setWaitingForBets(true);
