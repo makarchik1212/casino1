@@ -25,7 +25,14 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
     if (isLive && !hasCrashed) {
       setDisplayMultiplier(multiplier);
     } else if (hasCrashed) {
-      // Сохраняем последний множитель для экрана краша
+      // При крашах сбрасываем к 0 через таймаут
+      const crashValue = multiplier; // Сохраняем значение в момент краша
+      
+      // Показываем значение краша на 1.5 секунды
+      setTimeout(() => {
+        // После показа значения краша сбрасываем до 0
+        setDisplayMultiplier(0.00);
+      }, 1500);
     } else if (!isLive && !hasCrashed) {
       // Сбрасываем до 0.00 когда игра завершилась и начинается новая
       setDisplayMultiplier(0.00);
@@ -110,7 +117,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
   }, [isLive]);
   
   // Убираем белые точки на фоне по просьбе пользователя
-  const stars = [];
+  const stars: React.ReactNode[] = [];
   
   return (
     <div className={cn(
