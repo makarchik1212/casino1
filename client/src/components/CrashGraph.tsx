@@ -130,13 +130,10 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
       setStarPosition(100); // Reset star to bottom
     }
     
-    // Если нам передали waitingCountdown с сервера, используем его
+    // Всегда используем waitingCountdown с сервера когда он нам приходит
     if (waitingCountdown !== undefined) {
       setCountdown(waitingCountdown);
-    }
-    // Если режим ожидания закончился, сбрасываем счетчик
-    else if (!waitingForBets && isLive) {
-      setCountdown(0);
+      console.log("Установлен обратный отсчет:", waitingCountdown);
     }
   }, [isLive, waitingForBets, waitingCountdown]);
   
@@ -289,8 +286,8 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
       )}
       
       {/* Таймер отсчета в стиле Cobalt Lab - показывается в центре экрана */}
-      {waitingForBets && waitingCountdown !== undefined && (
-        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
+      {waitingCountdown !== undefined && waitingCountdown > 0 && (
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center z-50">
           <div className="relative z-30">
             <div className="bg-ui-dark/90 px-8 py-6 rounded-lg border-2 border-yellow-500/50 shadow-lg text-center">
               <div className="text-xl font-pixel text-white mb-2">СЛЕДУЮЩАЯ ИГРА</div>
