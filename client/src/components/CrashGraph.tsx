@@ -165,9 +165,9 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         </div>
       )}
       
-      {/* Эффект краша - упрощенный для лучшей производительности */}
-      {hasCrashed && waitingCountdown === undefined && (
-        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center z-40">
+      {/* Эффект краша - упрощенный для лучшей производительности - всегда показывается */}
+      {hasCrashed && (
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-start z-40 pt-20">
           <div className="relative">
             {/* Свечение */}
             <div className="absolute inset-0 bg-yellow-500 rounded-full animate-pulse opacity-60 blur-xl" 
@@ -182,14 +182,14 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         </div>
       )}
       
-      {/* Таймер обратного отсчета */}
-      {waitingCountdown !== undefined && waitingCountdown > 0 && (
+      {/* Таймер обратного отсчета - показывается даже после краша */}
+      {(hasCrashed || waitingCountdown !== undefined) && (
         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center z-50">
           <div className="relative z-30">
             <div className="bg-ui-dark/90 px-8 py-6 rounded-lg border-2 border-yellow-500/50 shadow-lg text-center">
               <div className="text-xl font-pixel text-white mb-2">СЛЕДУЮЩАЯ ИГРА</div>
               <div className="text-4xl font-pixel font-bold text-yellow-400 pulse-live">
-                {waitingCountdown}s
+                {waitingCountdown !== undefined ? waitingCountdown : 10}s
               </div>
             </div>
           </div>
