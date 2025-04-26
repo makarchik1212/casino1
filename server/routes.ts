@@ -541,43 +541,48 @@ function startCrashGameTimer(
               hasEnded: true
             });
             
-            // Start a new game after a longer pause (10 seconds) to give players time to place bets
-            setTimeout(async () => {
-              try {
-                const newCrashPoint = generateCrashPoint();
-                const newGame = await storage.createCrashGame({ crashPoint: newCrashPoint });
+            // Сразу отправляем событие с обратным отсчетом, чтобы показать таймер
+            updateGameState({
+              type: "crash_waiting",
+              gameId,
+              waitingCountdown: 10,
+              hasCrashed: true
+            });
+            
+            // Начинаем обратный отсчет для следующей игры
+            let countdown = 10;
+            const countdownInterval = setInterval(async () => {
+              countdown--;
+              
+              // Отправляем обновление каждую секунду с обратным отсчетом
+              updateGameState({
+                type: "crash_waiting",
+                gameId,
+                waitingCountdown: countdown,
+                hasCrashed: true
+              });
+              
+              // Когда отсчет закончился, создаем новую игру
+              if (countdown <= 0) {
+                clearInterval(countdownInterval);
                 
-                // Update game state with new game - включаем режим ожидания перед игрой
-                updateGameState({
-                  type: "crash_new_game",
-                  gameId: newGame.id,
-                  waitingForBets: true,
-                  waitingCountdown: 10
-                });
-                
-                // Добавляем обратный отсчет перед началом игры (10 секунд)
-                let countdown = 10;
-                const countdownInterval = setInterval(() => {
-                  countdown--;
+                try {
+                  const newCrashPoint = generateCrashPoint();
+                  const newGame = await storage.createCrashGame({ crashPoint: newCrashPoint });
                   
-                  // Отправляем обновление каждую секунду с обратным отсчетом
+                  // Update game state with new game
                   updateGameState({
-                    type: "crash_waiting",
-                    gameId: newGame.id,
-                    waitingCountdown: countdown
+                    type: "crash_new_game",
+                    gameId: newGame.id
                   });
                   
-                  // Когда отсчет закончился, начинаем игру
-                  if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    // Start timer for new game
-                    startCrashGameTimer(newGame.id, newCrashPoint, updateGameState);
-                  }
-                }, 1000);
-              } catch (err) {
-                console.error("Error starting new crash game:", err);
+                  // Start timer for new game
+                  startCrashGameTimer(newGame.id, newCrashPoint, updateGameState);
+                } catch (err) {
+                  console.error("Error starting new crash game:", err);
+                }
               }
-            }, 3000); // сокращаем паузу до 3 секунд, т.к. добавили 10 секунд отсчета
+            }, 1000);
           } catch (err) {
             console.error("Error ending crash game:", err);
           }

@@ -98,6 +98,12 @@ const CrashGame = () => {
                 console.error("Error showing toast:", error);
               }
             }
+            
+            // Если есть информация об обратном отсчете, показываем ее сразу
+            if (gameState.waitingCountdown !== undefined) {
+              setWaitingForBets(true);
+              setWaitingCountdown(gameState.waitingCountdown);
+            }
           }
         }
         

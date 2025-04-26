@@ -119,7 +119,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
   // Управление обратным отсчетом от переданного значения с сервера
   useEffect(() => {
     // Сбрасываем высоту графика и позицию звезды когда не в игре
-    if (!isLive && !hasCrashed) {
+    if (!isLive) {
       setHeight(0);
       setStarPosition(100); // Reset star to bottom
     }
@@ -132,7 +132,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
     else if (!waitingForBets && isLive) {
       setCountdown(0);
     }
-  }, [isLive, hasCrashed, waitingForBets, waitingCountdown]);
+  }, [isLive, waitingForBets, waitingCountdown]);
   
   return (
     <div className="crash-graph mb-4 bg-ui-medium rounded-md relative overflow-hidden border border-ui-dark">
@@ -224,8 +224,8 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
       
       {/* Большой коэффициент отображается вместе со звездой, поэтому здесь он не нужен */}
       
-      {/* Enhanced Crash Effect with Explosions (Cobalt Lab style) */}
-      {hasCrashed && (
+      {/* Enhanced Crash Effect with Explosions (только в момент краша) */}
+      {hasCrashed && waitingCountdown === undefined && (
         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
           {/* Main crash message with explosion effects */}
           <div className="relative">
@@ -274,8 +274,8 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         </div>
       )}
       
-      {/* Таймер в стиле скриншота */}
-      {!isLive && !hasCrashed && (
+      {/* Таймер в стиле скриншота - показываем или между играми или после краша, если есть таймер */}
+      {((!isLive && !hasCrashed) || (hasCrashed && waitingCountdown !== undefined)) && (
         <div className="timer-container">
           <div className="timer-value">
             {countdown ? countdown.toFixed(1) : "0.0"}
