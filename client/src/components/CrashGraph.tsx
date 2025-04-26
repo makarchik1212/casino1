@@ -109,21 +109,8 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
     }
   }, [isLive]);
   
-  // Звездное небо в фоне
-  const stars = Array.from({ length: 30 }).map((_, i) => {
-    const size = Math.random() < 0.3 ? 'w-2 h-2' : 'w-1 h-1';
-    const left = `${Math.random() * 100}%`;
-    const top = `${Math.random() * 100}%`;
-    const animation = Math.random() < 0.4 ? 'animate-pulse-slow' : '';
-    
-    return (
-      <div 
-        key={i} 
-        className={`absolute ${size} bg-blue-200 rounded-full ${animation}`} 
-        style={{ left, top, opacity: Math.random() * 0.5 + 0.3 }} 
-      />
-    );
-  });
+  // Убираем белые точки на фоне по просьбе пользователя
+  const stars = [];
   
   return (
     <div className={cn(
