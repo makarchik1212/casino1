@@ -123,9 +123,19 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         {stars}
       </div>
       
-      {/* Красное свечение по всему экрану при крашах */}
+      {/* Красное свечение по всему экрану при крашах - улучшенная версия */}
       {redGlow && (
-        <div className="absolute inset-0 bg-red-600/40 z-20 animate-red-pulse pointer-events-none"></div>
+        <>
+          {/* Основной красный оверлей */}
+          <div className="absolute inset-0 bg-red-600/50 z-20 animate-red-pulse pointer-events-none"></div>
+          
+          {/* Дополнительные слои градиента для усиления эффекта */}
+          <div className="absolute inset-0 bg-gradient-to-t from-red-700/30 to-transparent z-20 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-red-700/30 to-transparent z-20 pointer-events-none"></div>
+          
+          {/* Пульсирующий вихрь в центре */}
+          <div className="absolute left-1/2 top-1/2 w-[300px] h-[300px] -translate-x-1/2 -translate-y-1/2 bg-red-500/20 rounded-full animate-pulse-fast blur-xl z-20 pointer-events-none"></div>
+        </>
       )}
 
       {/* Фоновая сетка */}
@@ -150,7 +160,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         }}
       />
 
-      {/* Анимация взрыва звезды */}
+      {/* Анимация взрыва звезды - улучшенная версия */}
       {showExplosion && (
         <div className="absolute left-1/2 z-30"
           style={{ 
@@ -158,29 +168,79 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
             transform: "translate(-50%, 50%)"
           }}
         >
-          <div className="absolute inset-0 w-40 h-40 -translate-x-1/2 -translate-y-1/2">
-            {/* Лучи взрыва */}
-            <div className="absolute w-40 h-40 animate-star-explosion">
-              {Array.from({ length: 12 }).map((_, i) => (
+          <div className="absolute inset-0 w-60 h-60 -translate-x-1/2 -translate-y-1/2">
+            {/* Длинные лучи взрыва */}
+            <div className="absolute w-full h-full animate-star-explosion">
+              {Array.from({ length: 16 }).map((_, i) => (
                 <div 
                   key={i}
-                  className="absolute w-2 h-16 bg-gradient-to-r from-red-600 via-yellow-500 to-orange-500 rounded"
+                  className="absolute w-2 h-24 bg-gradient-to-r from-red-600 via-yellow-500 to-orange-500 rounded"
                   style={{
                     left: '50%',
                     top: '50%',
                     transformOrigin: 'center bottom',
-                    transform: `rotate(${i * 30}deg) translateY(-100%)`,
+                    transform: `rotate(${i * 22.5}deg) translateY(-100%)`,
                     opacity: 0.8,
-                    filter: 'blur(2px)'
+                    filter: 'blur(1px)'
                   }}
                 />
               ))}
             </div>
             
-            {/* Круговое свечение */}
-            <div className="absolute w-32 h-32 bg-red-600/60 -translate-x-1/2 -translate-y-1/2 rounded-full animate-expand-fade"></div>
-            <div className="absolute w-24 h-24 bg-yellow-500/80 -translate-x-1/2 -translate-y-1/2 rounded-full animate-expand-fade delay-100"></div>
-            <div className="absolute w-16 h-16 bg-white/90 -translate-x-1/2 -translate-y-1/2 rounded-full animate-expand-fade delay-200"></div>
+            {/* Короткие резкие лучи */}
+            <div className="absolute w-full h-full animate-star-explosion" style={{ animationDelay: '0.1s' }}>
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div 
+                  key={i}
+                  className="absolute w-3 h-14 bg-gradient-to-r from-yellow-300 via-orange-500 to-red-500 rounded"
+                  style={{
+                    left: '50%',
+                    top: '50%',
+                    transformOrigin: 'center bottom',
+                    transform: `rotate(${i * 30 + 15}deg) translateY(-90%)`,
+                    opacity: 0.9,
+                    filter: 'blur(0px)'
+                  }}
+                />
+              ))}
+            </div>
+            
+            {/* Круговое свечение - большие круги */}
+            <div className="absolute w-48 h-48 bg-red-600/70 -translate-x-1/2 -translate-y-1/2 rounded-full animate-expand-fade"></div>
+            <div className="absolute w-36 h-36 bg-yellow-500/80 -translate-x-1/2 -translate-y-1/2 rounded-full animate-expand-fade delay-100"></div>
+            <div className="absolute w-24 h-24 bg-white/90 -translate-x-1/2 -translate-y-1/2 rounded-full animate-expand-fade delay-200"></div>
+            
+            {/* Дополнительное красное свечение для усиления эффекта */}
+            <div className="absolute w-full h-full -translate-x-1/2 -translate-y-1/2">
+              <div className="absolute w-60 h-60 bg-red-600/30 rounded-full animate-red-pulse"></div>
+              <div className="absolute w-72 h-72 bg-red-500/20 rounded-full animate-red-pulse" style={{ animationDelay: '0.2s' }}></div>
+            </div>
+            
+            {/* Искры разлетающиеся во все стороны */}
+            {Array.from({ length: 20 }).map((_, i) => {
+              const angle = Math.random() * 360;
+              const distance = 30 + Math.random() * 80;
+              const delay = Math.random() * 0.3;
+              const size = 2 + Math.random() * 5;
+              
+              return (
+                <div 
+                  key={`spark-${i}`} 
+                  className="absolute w-1 h-1 bg-yellow-300 rounded-full"
+                  style={{
+                    left: '50%',
+                    top: '50%',
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${distance}px)`,
+                    opacity: 0.9,
+                    animation: `expand-fade 0.6s forwards`,
+                    animationDelay: `${delay}s`,
+                    boxShadow: '0 0 8px 2px rgba(255, 215, 0, 0.6)'
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
       )}
