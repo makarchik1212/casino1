@@ -465,18 +465,18 @@ function generateCrashPoint(): number {
     const result = baseValue + exponent * 4;
     return Math.min(Math.floor(result * 100) / 100, 40);
   } else {
-    // Method 3: Mixture model for extreme randomness
+    // Method 3: Mixture model with reduced extreme values
     const baseValue = 1.01;
     const roll = Math.random();
     
-    if (roll < 0.7) { // 70% chance (49% of total)
-      return baseValue + (Math.random() * Math.random()) * 1.5; // 1.01-2.51
-    } else if (roll < 0.9) { // 20% chance (14% of total)
-      return 2.51 + Math.random() * 7.5; // 2.51-10.00
-    } else { // 10% chance (7% of total)
-      // Rare high values, can reach very high spikes
-      const spikeFactor = Math.random() < 0.3 ? 10 : 3; // 30% chance of extreme spike
-      return 10.01 + Math.random() * 30 * spikeFactor; // 10.01-40.00 or 10.01-300.00
+    if (roll < 0.8) { // 80% chance (increased from 70%)
+      return baseValue + (Math.random() * Math.random()) * 1.3; // 1.01-2.30 (reduced max)
+    } else if (roll < 0.95) { // 15% chance (reduced from 20%)
+      return 2.31 + Math.random() * 5.7; // 2.31-8.00 (reduced max)
+    } else { // 5% chance (reduced from 10%)
+      // Rare high values, but with lower maximum
+      const spikeFactor = Math.random() < 0.2 ? 5 : 2; // 20% chance of moderate spike (reduced)
+      return 8.01 + Math.random() * 12 * spikeFactor; // 8.01-20.00 or 8.01-70.00 (significantly reduced max)
     }
   }
 }
