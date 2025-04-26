@@ -25,14 +25,8 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
     if (isLive && !hasCrashed) {
       setDisplayMultiplier(multiplier);
     } else if (hasCrashed) {
-      // При крашах сбрасываем к 0 через таймаут
-      const crashValue = multiplier; // Сохраняем значение в момент краша
-      
-      // Показываем значение краша на 1.5 секунды
-      setTimeout(() => {
-        // После показа значения краша сбрасываем до 0
-        setDisplayMultiplier(0.00);
-      }, 1500);
+      // При крашах сразу сбрасываем к 0
+      setDisplayMultiplier(0.00);
     } else if (!isLive && !hasCrashed) {
       // Сбрасываем до 0.00 когда игра завершилась и начинается новая
       setDisplayMultiplier(0.00);
@@ -255,7 +249,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
             {/* Текст */}
             <div className="bg-red-600 px-8 py-5 rounded-lg font-pixel text-white z-50 relative animate-shake border-2 border-yellow-500">
               <span className="text-2xl font-bold block text-center mb-1">CRASHED!</span>
-              <span className="block text-3xl font-bold text-yellow-300 text-center">{displayMultiplier.toFixed(2)}x</span>
+              <span className="block text-3xl font-bold text-yellow-300 text-center">0.00x</span>
             </div>
           </div>
         </div>
