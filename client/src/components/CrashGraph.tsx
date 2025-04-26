@@ -155,7 +155,17 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
   }, [isLive, hasCrashed]);
   
   return (
-    <div className="crash-graph mb-4 bg-ui-medium rounded relative overflow-hidden">
+    <div className="crash-graph mb-4 bg-ui-medium rounded-md relative overflow-hidden border border-ui-dark">
+      {/* Сетка фона для графика */}
+      <div className="absolute inset-0 grid grid-cols-5 grid-rows-5 opacity-20 pointer-events-none">
+        {Array.from({ length: 25 }).map((_, i) => (
+          <div key={i} className="border border-white/10"></div>
+        ))}
+      </div>
+      
+      {/* Дополнительный градиент для фона */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-ui-dark/40 to-transparent"></div>
+      
       {/* Линия графика с более плавной анимацией и градиентом */}
       <div 
         className={cn(
@@ -284,22 +294,47 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
         </div>
       )}
       
+      {/* Улучшенный таймер в стиле Cobalt Lab */}
       {!isLive && !hasCrashed && (
         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-          <div className="bg-ui-dark px-6 py-3 rounded-lg font-pixel text-white text-center mb-2">
-            <div className="mb-1 text-accent animate-pulse-slow">PLACE YOUR BETS NOW!</div>
-            <div className="text-sm">NEXT ROUND STARTING IN</div>
+          <div className="bg-cobalt-gradient border-gold px-8 py-4 rounded-lg font-pixel text-white text-center mb-2">
+            {/* Верхняя часть с мигающими огнями */}
+            <div className="flex justify-center items-center mb-2">
+              <div className="w-2 h-2 bg-danger rounded-full animate-pulse-soft mr-2"></div>
+              <div className="text-accent font-bold text-lg animate-pulse-slow tracking-wider">PLACE YOUR BETS</div>
+              <div className="w-2 h-2 bg-danger rounded-full animate-pulse-soft ml-2"></div>
+            </div>
             
-            {/* Таймер обратного отсчета с анимацией */}
-            <div className="mt-2 text-3xl font-pixel relative">
-              <span className="animate-timer">{countdown}</span>
-              <span className="text-sm ml-1 text-accent">s</span>
+            {/* Линия разделитель */}
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-accent to-transparent my-2"></div>
+            
+            <div className="text-sm text-white/80 uppercase tracking-wide">NEXT ROUND IN</div>
+            
+            {/* Таймер обратного отсчета с улучшенной анимацией */}
+            <div className="mt-3 flex items-center justify-center">
+              <div className="relative flex items-center">
+                {/* Круглая подложка для таймера */}
+                <div className="absolute inset-0 bg-accent/10 rounded-full animate-pulse-soft" 
+                     style={{ transform: 'scale(1.3)' }}></div>
+                     
+                {/* Цифра таймера */}
+                <div className="text-4xl font-pixel animate-timer relative z-10 px-4">
+                  <span className="text-accent font-bold">{countdown}</span>
+                  <span className="text-sm text-white ml-1">s</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-ui-dark bg-opacity-80 px-4 py-2 rounded-lg mt-2">
-            <div className="w-3 h-3 bg-secondary rounded-full animate-pulse"></div>
-            <div className="w-3 h-3 bg-secondary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-3 h-3 bg-secondary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          
+          {/* Индикаторы активности */}
+          <div className="flex items-center gap-3 bg-ui-dark/80 backdrop-blur-sm px-5 py-2 rounded-full mt-3 border border-accent/20">
+            {[0, 1, 2].map((i) => (
+              <div 
+                key={i}
+                className="w-2 h-2 bg-accent rounded-full animate-pulse" 
+                style={{ animationDelay: `${i * 0.2}s` }}
+              ></div>
+            ))}
           </div>
         </div>
       )}

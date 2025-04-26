@@ -272,80 +272,125 @@ const CrashGame = () => {
   };
   
   return (
-    <div>
-      <PixelCard className="mb-8 p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-pixel text-white text-lg">CRASH GAME</h2>
-          <div className="flex items-center">
-            <span className={cn(
-              "font-pixel text-xl mr-2",
-              isLive && !hasCrashed && "text-accent blink",
-              hasCrashed && "text-primary"
-            )}>
-              {currentMultiplier.toFixed(2)}x
-            </span>
-            {isLive && !hasCrashed && (
-              <span className="bg-primary px-2 py-1 rounded font-pixel text-xs">LIVE</span>
-            )}
-          </div>
-        </div>
-        
-        {/* Game Interface */}
-        {isLoadingGame ? (
-          <Skeleton className="h-[200px] w-full bg-ui-medium" />
-        ) : (
-          <CrashGraph 
-            multiplier={currentMultiplier} 
-            isLive={isLive}
-            hasCrashed={hasCrashed}
-          />
-        )}
-        
-        {/* Game Controls */}
-        <BetControls
-          betAmount={betAmount}
-          onBetChange={setBetAmount}
-          secondaryValue={autoCashoutAt}
-          onSecondaryChange={setAutoCashoutAt}
-          secondaryLabel="AUTO CASHOUT AT"
-          secondarySuffix="X"
-          submitLabel={currentBet && isLive ? `CASHOUT ${Math.floor(betAmount * currentMultiplier)}` : "PLACE BET"}
-          onSubmit={currentBet && isLive ? handleCashout : handlePlaceBet}
-          isSubmitDisabled={
-            (currentBet && (!isLive || hasCrashed)) || 
-            (!currentBet && isLive) ||
-            !user
-          }
-          isLoading={isBetting || isCashingOut}
-          variant={currentBet && isLive ? "secondary" : "primary"}
-        />
-        
-        {/* Game History */}
-        <div className="mt-6">
-          <h3 className="font-pixel text-sm mb-2">RECENT RESULTS</h3>
-          <div className="flex space-x-2 overflow-x-auto pb-2">
-            {recentResults.map((result, index) => (
-              <div 
-                key={index}
-                className={cn(
-                  "px-3 py-1 rounded font-pixel text-xs whitespace-nowrap",
-                  result < 2 ? "bg-danger" : "bg-success"
+    <div className="max-w-5xl mx-auto">
+      {/* Crash Game Header with Graphic Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+        <div className="lg:col-span-2">
+          <PixelCard className="p-4 h-full">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center">
+                <div className="w-2 h-8 bg-accent mr-2"></div>
+                <h2 className="font-pixel text-white text-xl uppercase">Crash Game</h2>
+              </div>
+              
+              <div className="flex items-center bg-ui-dark px-3 py-1.5 rounded-md">
+                <span className={cn(
+                  "font-pixel text-xl font-bold",
+                  isLive && !hasCrashed && "text-accent animate-pulse-slow",
+                  hasCrashed && "text-primary"
+                )}>
+                  {currentMultiplier.toFixed(2)}x
+                </span>
+                {isLive && !hasCrashed && (
+                  <span className="bg-primary ml-2 px-2 py-0.5 rounded font-pixel text-xs flex items-center">
+                    <span className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></span>
+                    LIVE
+                  </span>
                 )}
-              >
-                {result.toFixed(2)}x
               </div>
-            ))}
-            {recentResults.length === 0 && (
-              <div className="text-muted-foreground font-pixelText">
-                No recent results. Start playing to see game history!
-              </div>
+            </div>
+            
+            {/* Game Interface */}
+            {isLoadingGame ? (
+              <Skeleton className="h-[300px] w-full bg-ui-medium" />
+            ) : (
+              <CrashGraph 
+                multiplier={currentMultiplier} 
+                isLive={isLive}
+                hasCrashed={hasCrashed}
+              />
             )}
-          </div>
+          </PixelCard>
         </div>
-      </PixelCard>
+        
+        {/* Bet Controls Column */}
+        <div>
+          <PixelCard className="p-4 h-full">
+            <h3 className="font-pixel text-white border-b border-ui-medium pb-2 mb-4 flex items-center">
+              <span className="w-2 h-2 bg-accent rounded-full mr-2"></span>
+              PLACE YOUR BET
+            </h3>
+            
+            {/* Game Controls */}
+            <BetControls
+              betAmount={betAmount}
+              onBetChange={setBetAmount}
+              secondaryValue={autoCashoutAt}
+              onSecondaryChange={setAutoCashoutAt}
+              secondaryLabel="AUTO CASHOUT AT"
+              secondarySuffix="X"
+              submitLabel={currentBet && isLive ? `CASHOUT ${Math.floor(betAmount * currentMultiplier)}` : "PLACE BET"}
+              onSubmit={currentBet && isLive ? handleCashout : handlePlaceBet}
+              isSubmitDisabled={
+                (currentBet && (!isLive || hasCrashed)) || 
+                (!currentBet && isLive) ||
+                !user
+              }
+              isLoading={isBetting || isCashingOut}
+              variant={currentBet && isLive ? "secondary" : "primary"}
+            />
+          </PixelCard>
+        </div>
+      </div>
       
-      {/* Player's Game History */}
-      <GameHistory limit={5} />
+      {/* Recent Results and Game History */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-1">
+          <PixelCard className="p-4">
+            <h3 className="font-pixel text-white border-b border-ui-medium pb-2 mb-4 flex items-center">
+              <span className="w-2 h-2 bg-success rounded-full mr-2"></span>
+              RECENT RESULTS
+            </h3>
+            <div className="grid grid-cols-3 gap-2 scrollbar-cobalt overflow-auto pb-1 max-h-40">
+              {recentResults.map((result, index) => (
+                <div 
+                  key={index}
+                  className={cn(
+                    "px-3 py-2 rounded-md font-pixel text-center whitespace-nowrap transition-all",
+                    result < 2 
+                      ? "result-lose" 
+                      : "result-win",
+                    index === 0 && "border-gold animate-pulse-soft" // Highlight the most recent result
+                  )}
+                >
+                  <span className={cn(
+                    "text-sm font-bold",
+                    result < 2 ? "text-danger-foreground" : "text-success-foreground"
+                  )}>
+                    {result.toFixed(2)}x
+                  </span>
+                </div>
+              ))}
+              {recentResults.length === 0 && (
+                <div className="col-span-3 text-muted-foreground font-pixelText text-center py-4">
+                  No recent results. Start playing to see game history!
+                </div>
+              )}
+            </div>
+          </PixelCard>
+        </div>
+        
+        <div className="lg:col-span-2">
+          {/* Player's Game History */}
+          <PixelCard className="p-4">
+            <h3 className="font-pixel text-white border-b border-ui-medium pb-2 mb-4 flex items-center">
+              <span className="w-2 h-2 bg-secondary rounded-full mr-2"></span>
+              YOUR GAME HISTORY
+            </h3>
+            <GameHistory limit={5} showPagination={true} />
+          </PixelCard>
+        </div>
+      </div>
     </div>
   );
 };
