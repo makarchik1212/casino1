@@ -18,12 +18,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     currentCrashGame: null as any,
     currentMultiplier: 1.0,
     lastUpdate: Date.now(),
-    gameHistory: [] as any[]
+    gameHistory: [] as any[],
+    type: null as string | null,
+    waitingCountdown: null as number | null,
+    nextGameId: null as number | null,
+    hasCrashed: false
   };
   
   // Helper function to update game state (replacing broadcast)
   const updateGameState = (data: any) => {
     try {
+      // Store the original type for state reference
+      gameState.type = data.type;
+      
       // Update the appropriate state based on the type
       if (data.type === 'crash_update') {
         gameState.currentMultiplier = data.currentMultiplier;
@@ -41,12 +48,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (data.type === 'crash_new_game') {
         gameState.currentCrashGame = { id: data.gameId };
         gameState.currentMultiplier = 1.0;
+        gameState.nextGameId = null;
+        gameState.waitingCountdown = null;
+        gameState.hasCrashed = false;
+      } else if (data.type === 'crash_waiting') {
+        gameState.waitingCountdown = data.waitingCountdown;
+        gameState.hasCrashed = data.hasCrashed;
+        // Сохраняем ID следующей игры если он предоставлен
+        if (data.nextGameId) {
+          gameState.nextGameId = data.nextGameId;
+        }
       }
       
       console.log(`Game state updated: ${data.type}`);
     } catch (err) {
       console.error("Error updating game state:", err);
     }
+  };
+  
+  // Функция для получения текущего состояния игры
+  const getGameState = () => {
+    return { ...gameState };
   };
   
   // Polling endpoint for game updates
@@ -178,10 +200,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Проверка игрового состояния (позволяет делать ставки и во время отсчета между играми)
+      const currentGameState = getGameState();
+      
+      // Если это новая игра, которая еще не началась (waitingCountdown), то меняем gameId на новую игру
+      if (currentGameState.type === "crash_waiting" && currentGameState.nextGameId) {
+        betData.gameId = currentGameState.nextGameId;
+      } else if (currentGameState.type === "crash_waiting" && !currentGameState.nextGameId) {
+        // Если идет отсчет, но еще нет ID следующей игры, сохраняем ставку для следующей игры
+        // Создаем новую игру заранее
+        const newCrashPoint = generateCrashPoint();
+        const newGame = await storage.createCrashGame({ crashPoint: newCrashPoint });
+        betData.gameId = newGame.id;
+        
+        // Обновляем состояние, чтобы другие клиенты тоже знали ID следующей игры
+        updateGameState({
+          type: "crash_waiting",
+          gameId: currentGameState.currentCrashGame?.id || null,
+          waitingCountdown: currentGameState.waitingCountdown,
+          hasCrashed: true,
+          nextGameId: newGame.id
+        });
+      }
+      
       // Verify crash game exists
       const crashGame = await storage.getCrashGame(betData.gameId);
       if (!crashGame) {
         return res.status(404).json({ message: "Crash game not found" });
+      }
+      
+      // Check if game already started and is live
+      if (currentGameState.type === "crash_update" && crashGame.id === currentGameState.currentCrashGame?.id) {
+        // Если игра уже идет, проверяем, разрешены ли еще ставки
+        // Позволяем ставки только на ранних стадиях (коэффициент ниже 1.2)
+        if (currentGameState.currentMultiplier > 1.2) {
+          return res.status(400).json({ message: "Betting time has ended for this round" });
+        }
       }
       
       // Check if game already ended
@@ -541,12 +595,17 @@ function startCrashGameTimer(
               hasEnded: true
             });
             
-            // Немедленно показываем таймер обратного отсчета
+            // Создаем ID следующей игры заранее
+            const nextCrashPoint = generateCrashPoint();
+            const nextGame = await storage.createCrashGame({ crashPoint: nextCrashPoint });
+            
+            // Немедленно показываем таймер обратного отсчета с ID следующей игры
             updateGameState({
               type: "crash_waiting",
               gameId,
               waitingCountdown: 10,
-              hasCrashed: true
+              hasCrashed: true,
+              nextGameId: nextGame.id // Добавляем ID следующей игры для размещения ставок заранее
             });
             
             // Начинаем обратный отсчет для следующей игры
@@ -554,30 +613,29 @@ function startCrashGameTimer(
             const countdownInterval = setInterval(async () => {
               countdown--;
               
-              // Отправляем обновление каждую секунду с обратным отсчетом
+              // Отправляем обновление каждую секунду с обратным отсчетом и ID следующей игры
               updateGameState({
                 type: "crash_waiting",
                 gameId,
                 waitingCountdown: countdown,
-                hasCrashed: true
+                hasCrashed: true,
+                nextGameId: nextGame.id // Сохраняем ID следующей игры
               });
               
-              // Когда отсчет закончился, создаем новую игру
+              // Когда отсчет закончился, запускаем новую игру
               if (countdown <= 0) {
                 clearInterval(countdownInterval);
                 
                 try {
-                  const newCrashPoint = generateCrashPoint();
-                  const newGame = await storage.createCrashGame({ crashPoint: newCrashPoint });
-                  
+                  // Используем уже созданную игру
                   // Update game state with new game
                   updateGameState({
                     type: "crash_new_game",
-                    gameId: newGame.id
+                    gameId: nextGame.id
                   });
                   
                   // Start timer for new game
-                  startCrashGameTimer(newGame.id, newCrashPoint, updateGameState);
+                  startCrashGameTimer(nextGame.id, nextCrashPoint, updateGameState);
                 } catch (err) {
                   console.error("Error starting new crash game:", err);
                 }
