@@ -460,10 +460,5 @@
     animation: flicker 0.3s infinite;
   }
   
-  /* Обновленное плавное покачивание для звезды при высоких коэффициентах */
-  @keyframes subtle-wobble-updated {
-    0% { transform: rotate(-1deg); }
-    50% { transform: rotate(1deg); }
-    100% { transform: rotate(-1deg); }
-  }
+  /* Применяем обновленные стили */
 }
