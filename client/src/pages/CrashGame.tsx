@@ -366,7 +366,7 @@ const CrashGame = () => {
               secondarySuffix="X"
               submitLabel={currentBet && isLive 
                 ? `CASHOUT ${Math.floor(currentBet.betAmount * currentMultiplier)} (+${Math.floor(currentBet.betAmount * currentMultiplier - currentBet.betAmount)})` 
-                : waitingForBets && waitingCountdown ? `PLACE BET (${waitingCountdown})` : "PLACE BET"}
+                : "PLACE BET"}
               onSubmit={currentBet && isLive ? handleCashout : handlePlaceBet}
               isSubmitDisabled={
                 (currentBet && (!isLive || hasCrashed)) || 
@@ -377,6 +377,7 @@ const CrashGame = () => {
               }
               isLoading={isBetting || isCashingOut}
               variant={currentBet && isLive ? "secondary" : "primary"}
+              waitingCountdown={waitingCountdown}
             />
           </PixelCard>
         </div>

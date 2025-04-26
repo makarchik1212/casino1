@@ -15,6 +15,7 @@ interface BetControlsProps {
   isSubmitDisabled?: boolean;
   isLoading?: boolean;
   variant?: "primary" | "secondary";
+  waitingCountdown?: number; // Добавляем обратный отсчет для отображения на кнопке
 }
 
 const BetControls = ({
@@ -28,7 +29,8 @@ const BetControls = ({
   onSubmit,
   isSubmitDisabled = false,
   isLoading = false,
-  variant = "primary"
+  variant = "primary",
+  waitingCountdown
 }: BetControlsProps) => {
   const [betInput, setBetInput] = useState(betAmount.toString());
   const [secondaryInput, setSecondaryInput] = useState(
@@ -173,15 +175,20 @@ const BetControls = ({
         </div>
       )}
       
-      {/* Submit Button - Full Width */}
+      {/* Submit Button - Full Width с отображением таймера */}
       <div className="col-span-2 mt-2">
         <PixelButton
           variant={variant}
-          className={`w-full py-3 font-pixel text-lg uppercase ${submitLabel.includes("(") ? "countdown-button" : ""}`}
+          className={`w-full py-3 font-pixel text-lg uppercase ${waitingCountdown !== undefined ? "bg-red-600 animate-pulse-slow" : ""}`}
           onClick={handleSubmit}
-          disabled={isSubmitDisabled || isLoading}
+          disabled={isSubmitDisabled || isLoading || waitingCountdown !== undefined}
         >
-          {isLoading ? "LOADING..." : submitLabel}
+          {isLoading 
+            ? "LOADING..." 
+            : waitingCountdown !== undefined && waitingCountdown > 0
+              ? `${submitLabel} (${waitingCountdown}s)`
+              : submitLabel
+          }
         </PixelButton>
       </div>
     </div>
