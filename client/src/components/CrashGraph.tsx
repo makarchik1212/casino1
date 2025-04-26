@@ -84,20 +84,26 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
           return newHeight;
         });
         
-        // Update star position to move up from bottom (100%) to center (50%)
+        // Обновляем позицию звезды - в стиле Cobalt Lab
         setStarPosition(prev => {
-          // Configure star to start from bottom (100%) and move to center (50%)
-          // Star stops at the center (50%) regardless of multiplier value
-          const center = 50;
-          const startPos = 100;
+          // На Cobalt Lab ракета начинает с нижней части экрана и поднимается вверх, замедляясь
+          // при более высоких коэффициентах
+          const startPos = 100; // Начало снизу экрана (100%)
+          const minPos = 15;    // Максимальная высота подъема (15% от низа)
           
-          // Value between 0 and 1 representing progress toward target
-          // Use eased movement for smoother animation
-          const progressFactor = Math.min(1, (multiplier - 1) * 0.4); // Slower movement to center
+          // Логарифмическая функция для замедления подъема (точно как на Cobalt Lab)
+          // Используется натуральный логарифм для замедления при высоких коэффициентах
+          const logBase = 1.18; // Настройка скорости замедления
+          const logProgress = Math.log(multiplier) / Math.log(logBase);
           
-          // Calculate new position with easing
-          const easing = 1 - Math.pow(1 - progressFactor, 3); // Cubic easing
-          const newPosition = startPos - (startPos - center) * easing;
+          // Ограничиваем прогресс диапазоном 0-1
+          const progressFactor = Math.min(1, logProgress * 0.12); 
+          
+          // Кубическое замедление для более естественного движения (как на Cobalt Lab)
+          const easing = 1 - Math.pow(1 - progressFactor, 3);
+          
+          // Рассчитываем новую позицию с учетом замедления
+          const newPosition = startPos - (startPos - minPos) * easing;
           
           return newPosition;
         });
@@ -176,47 +182,50 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         </div>
       ))}
       
-      {/* Rocket/Star Animation (Cobalt Lab style) */}
+      {/* Rocket/Star Animation (точно как на Cobalt Lab) */}
       {isLive && !hasCrashed && (
         <div 
-          className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-200"
+          className="absolute left-1/2 transform -translate-x-1/2 transition-all"
           style={{ 
             bottom: `${Math.min(50, starPosition)}%`, // Max at 50% height (center of screen)
             filter: `drop-shadow(0 0 ${Math.min(20, 5 + multiplier/2)}px rgba(255, 215, 0, 0.7))`,
             zIndex: 10, // Ensure star is above graph line
-            transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            transition: 'bottom 0.15s ease-out' // Более плавное движение вверх как на Cobalt Lab
           }}
         >
           <div className="relative flex flex-col items-center">
-            {/* Main star with glow effect - larger and more dramatic */}
+            {/* Главная звезда (в стиле ракеты Cobalt Lab) */}
             <div 
-              className="animate-spin-slow relative"
+              className={`relative ${multiplier >= 2 ? 'animate-subtle-wobble' : ''}`}
               style={{
-                transform: `scale(${Math.min(1.5, 1 + multiplier/15)})`, // Grow more dramatically with multiplier
+                transform: `scale(${Math.min(1.5, 1 + multiplier/15)})`, // Рост с увеличением множителя
               }}
             >
-              <div className="absolute -inset-1 bg-accent rounded-full opacity-20 animate-pulse-slow blur-md"></div>
-              <StarIcon size={45} />
+              {/* Эффект свечения как на Cobalt Lab */}
+              <div className="absolute -inset-1 bg-yellow-400 rounded-full opacity-30 animate-pulse-slow blur-md"></div>
               
-              {/* Spark/trail effects */}
+              {/* Основная звезда - более яркая */}
+              <StarIcon size={50} className="text-yellow-400" />
+              
+              {/* Эффекты "двигателя" - точно как на Cobalt Lab */}
               <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80">
-                <div className="w-1 h-6 bg-gradient-to-t from-accent to-transparent rounded-full"></div>
+                <div className="w-1 h-8 bg-gradient-to-t from-yellow-500 via-orange-500 to-transparent rounded-full animate-flicker"></div>
+                <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-yellow-400 blur-sm rounded-full animate-pulse"></div>
               </div>
             </div>
             
-            {/* Coefficient display - more stylized and modern */}
+            {/* Коэффициент в стиле Cobalt Lab - ниже звезды без фона */}
             <div 
-              className="mt-3 font-pixel text-accent bg-ui-dark bg-opacity-90 px-3 py-1.5 rounded-md whitespace-nowrap border border-accent/30"
+              className="mt-3 font-pixel whitespace-nowrap"
               style={{
-                boxShadow: multiplier >= 2 ? '0 0 15px rgba(255, 215, 0, 0.3)' : 'none',
-                fontSize: Math.min(24, 16 + (multiplier / 2)) + 'px', // Dynamic sizing based on multiplier
-                transform: multiplier >= 3 ? 'scale(1.05)' : 'scale(1)',
-                transition: 'all 0.2s'
+                color: '#FFDE30', // Ярко-желтый как на Cobalt Lab
+                textShadow: '0 0 10px rgba(255, 215, 0, 0.7)',
+                fontSize: Math.min(28, 18 + (multiplier / 2)) + 'px', // Динамический размер
+                fontWeight: multiplier >= 2 ? 'bold' : 'normal',
+                transition: 'all 0.1s ease-out'
               }}
             >
-              <span className={multiplier >= 2 ? "text-accent font-bold" : "text-accent"}>
-                {multiplier.toFixed(2)}x
-              </span>
+              {multiplier.toFixed(2)}x
             </div>
           </div>
         </div>
@@ -224,51 +233,56 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
       
       {/* Большой коэффициент отображается вместе со звездой, поэтому здесь он не нужен */}
       
-      {/* Enhanced Crash Effect with Explosions (только в момент краша) */}
+      {/* Эффект взрыва в стиле Cobalt Lab с сохранением звезды */}
       {hasCrashed && waitingCountdown === undefined && (
-        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-          {/* Main crash message with explosion effects */}
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center z-40">
+          {/* Основной эффект взрыва */}
           <div className="relative">
-            {/* Background glow/explosion */}
-            <div className="absolute inset-0 bg-primary rounded-full animate-pulse opacity-70 blur-xl" 
-                style={{ transform: 'scale(2)' }}></div>
+            {/* Фоновое свечение взрыва как на Cobalt Lab */}
+            <div className="absolute inset-0 bg-yellow-500 rounded-full animate-pulse opacity-60 blur-xl" 
+                style={{ transform: 'scale(3)' }}></div>
                 
-            {/* Explosion particles - more dynamic with random sizes and directions */}
-            {Array.from({length: 12}).map((_, i) => {
-              // Create random directions for particles
-              const angle = Math.random() * 360;
-              const distance = 30 + Math.random() * 70;
-              const size = 2 + Math.random() * 3;
-              const delay = Math.random() * 0.2;
+            {/* Частицы взрыва в стиле Cobalt Lab - летят во все стороны */}
+            {Array.from({length: 20}).map((_, i) => {
+              // Случайный угол для равномерного распределения частиц
+              const angle = (i / 20) * 360 + (Math.random() * 18); // Распределяем равномерно + небольшая случайность
+              const distance = 50 + Math.random() * 100; // Дальность полета
+              const size = 2 + Math.random() * 4; // Размер частицы
+              const delay = Math.random() * 0.15; // Задержка анимации
+              const duration = 0.5 + Math.random() * 0.4; // Длительность анимации
               
-              // Assign random custom properties for the animation
+              // Свойства для анимации частицы
               const style = {
                 '--x': `${Math.cos(angle * (Math.PI/180)) * distance}px`,
                 '--y': `${Math.sin(angle * (Math.PI/180)) * distance}px`,
+                '--duration': `${duration}s`,
               } as React.CSSProperties;
               
               return (
                 <div 
                   key={i}
-                  className="absolute bg-accent rounded-full animate-explosion-particle" 
+                  className="absolute rounded-full animate-explosion-particle" 
                   style={{
                     left: '50%',
                     top: '50%',
                     width: `${size}px`,
                     height: `${size}px`,
-                    opacity: 0.8,
+                    opacity: 0.9,
+                    background: i % 3 === 0 ? '#FFD700' : (i % 3 === 1 ? '#FF8C00' : '#FF4500'), // Желтые и оранжевые частицы
                     transform: 'translate(-50%, -50%)',
                     animationDelay: `${delay}s`,
+                    animationDuration: `${duration}s`,
+                    boxShadow: '0 0 4px rgba(255, 215, 0, 0.7)',
                     ...style
                   }}
                 ></div>
               );
             })}
             
-            {/* Main crash text */}
-            <div className="bg-primary px-6 py-3 rounded-lg font-pixel text-white z-20 relative animate-shake">
-              <span className="text-xl font-bold">CRASHED!</span>
-              <span className="block text-2xl font-bold">{multiplier.toFixed(2)}x</span>
+            {/* Текст о краше - в стиле Cobalt Lab (большой, заметный) */}
+            <div className="bg-red-600 px-8 py-5 rounded-lg font-pixel text-white z-50 relative animate-shake border-2 border-yellow-500">
+              <span className="text-2xl font-bold block text-center mb-1">CRASHED!</span>
+              <span className="block text-3xl font-bold text-yellow-300 text-center">{multiplier.toFixed(2)}x</span>
             </div>
           </div>
         </div>
