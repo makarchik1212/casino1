@@ -114,11 +114,16 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
     };
   }, [multiplier, isLive, hasCrashed]);
   
-  // Reset graph when new game starts
+  // Управление обратным отсчетом при краше и между играми
   useEffect(() => {
-    if (!isLive && !hasCrashed) {
-      setHeight(0);
-      setStarPosition(100); // Reset star to bottom
+    // В обоих случаях - когда игра не активна или когда произошел краш - 
+    // показываем счетчик обратного отсчета
+    if (!isLive || hasCrashed) {
+      // Если не игра, сбрасываем высоту графика
+      if (!isLive) {
+        setHeight(0);
+        setStarPosition(100); // Reset star to bottom
+      }
       
       // Запустить обратный отсчет времени до следующей игры
       setCountdown(10); // Сбросить счетчик при начале нового отсчета
@@ -207,19 +212,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
               {multiplier.toFixed(2)}
             </div>
             
-            {/* Larger multiplier display below star */}
-            <div 
-              className="mt-1 font-pixel text-white bg-ui-dark bg-opacity-80 px-2 py-1 rounded whitespace-nowrap"
-              style={{
-                borderLeft: multiplier >= 2 ? '2px solid #FFD700' : 'none',
-                boxShadow: multiplier >= 3 ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none',
-                fontSize: multiplier >= 2 ? '18px' : '16px'
-              }}
-            >
-              <span className={multiplier >= 2 ? 'text-accent' : 'text-white'}>
-                {multiplier.toFixed(2)}x
-              </span>
-            </div>
+            {/* Удалена вторая анимация коэффициента под звездой */}
           </div>
         </div>
       )}
@@ -227,9 +220,18 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
       {/* Большой коэффициент отображается вместе со звездой, поэтому здесь он не нужен */}
       
       {hasCrashed && (
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-          <div className="bg-primary px-4 py-2 rounded font-pixel text-white animate-bounce">
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
+          <div className="bg-primary px-4 py-2 rounded font-pixel text-white animate-bounce mb-4">
             CRASHED!
+          </div>
+          
+          {/* Таймер обратного отсчета, который сразу появляется после краша */}
+          <div className="bg-ui-dark px-6 py-3 rounded-lg font-pixel text-white text-center">
+            <div className="mb-1 text-accent animate-pulse-slow">NEXT ROUND IN</div>
+            <div className="mt-2 text-3xl text-accent font-pixel relative">
+              <span className="animate-pulse-slow">{countdown}</span>
+              <span className="text-sm ml-1">s</span>
+            </div>
           </div>
         </div>
       )}
