@@ -36,6 +36,9 @@ const CrashGame = () => {
   const [isBetting, setIsBetting] = useState(false);
   const [isCashingOut, setIsCashingOut] = useState(false);
   
+  // Список активных ставок в текущей игре
+  const [activeBets, setActiveBets] = useState<any[]>([]);
+  
   // Polling for real-time updates (replacing WebSocket)
   useEffect(() => {
     let pollInterval: ReturnType<typeof setInterval>;
@@ -65,6 +68,11 @@ const CrashGame = () => {
           setWaitingCountdown(undefined);
           setIsLive(true);
           setHasCrashed(false);
+          
+          // Обновляем список активных ставок в стиле Cobalt Lab
+          if (gameState.activeBets) {
+            setActiveBets(gameState.activeBets);
+          }
           
           // Auto cashout if threshold is reached, we have a bet, and auto-cashout is enabled
           if (currentBet && autoCashoutAt && isAutoCashoutEnabled && gameState.currentMultiplier >= autoCashoutAt) {
@@ -390,8 +398,22 @@ const CrashGame = () => {
         </div>
       </div>
       
-      {/* Recent Results and Game History */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Active Bets and Recent Results */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+        <div className="lg:col-span-2">
+          <PixelCard className="p-4">
+            <h3 className="font-pixel text-white border-b border-ui-medium pb-2 mb-4 flex items-center">
+              <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
+              ACTIVE BETS
+            </h3>
+            {/* Список ставок в стиле Cobalt Lab */}
+            <CrashBetList 
+              bets={activeBets} 
+              currentMultiplier={currentMultiplier}
+            />
+          </PixelCard>
+        </div>
+        
         <div className="lg:col-span-1">
           <PixelCard className="p-4">
             <h3 className="font-pixel text-white border-b border-ui-medium pb-2 mb-4 flex items-center">
@@ -426,17 +448,17 @@ const CrashGame = () => {
             </div>
           </PixelCard>
         </div>
-        
-        <div className="lg:col-span-2">
-          {/* Player's Game History */}
-          <PixelCard className="p-4">
-            <h3 className="font-pixel text-white border-b border-ui-medium pb-2 mb-4 flex items-center">
-              <span className="w-2 h-2 bg-secondary rounded-full mr-2"></span>
-              YOUR GAME HISTORY
-            </h3>
-            <GameHistory limit={5} showPagination={true} />
-          </PixelCard>
-        </div>
+      </div>
+      
+      {/* Player's Game History */}
+      <div className="mb-6">
+        <PixelCard className="p-4">
+          <h3 className="font-pixel text-white border-b border-ui-medium pb-2 mb-4 flex items-center">
+            <span className="w-2 h-2 bg-secondary rounded-full mr-2"></span>
+            YOUR GAME HISTORY
+          </h3>
+          <GameHistory limit={5} showPagination={true} />
+        </PixelCard>
       </div>
     </div>
   );

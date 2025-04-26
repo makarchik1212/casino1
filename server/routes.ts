@@ -72,8 +72,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
   
   // Polling endpoint for game updates
-  app.get("/api/game-state", (req, res) => {
-    res.json(gameState);
+  app.get("/api/game-state", async (req, res) => {
+    try {
+      // Получаем активные ставки для текущей игры
+      let activeBets = [];
+      const currentGame = await storage.getCurrentCrashGame();
+      
+      if (currentGame) {
+        const bets = await storage.getCrashBetsByGameId(currentGame.id);
+        
+        // Обогащаем данные ставок информацией о пользователях для отображения
+        activeBets = await Promise.all(bets.map(async (bet) => {
+          const user = await storage.getUser(bet.userId);
+          return {
+            ...bet,
+            username: user ? user.username : 'Unknown',
+            avatarColor: user ? user.avatarColor : '#777777'
+          };
+        }));
+      }
+      
+      // Отправляем обновленное состояние с активными ставками
+      res.json({
+        ...gameState,
+        activeBets
+      });
+    } catch (error) {
+      console.error("Error getting active bets:", error);
+      res.json(gameState);
+    }
   });
   
   // User Authentication Routes
