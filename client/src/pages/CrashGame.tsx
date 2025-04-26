@@ -30,6 +30,7 @@ const CrashGame = () => {
   // Bet state
   const [betAmount, setBetAmount] = useState(100);
   const [autoCashoutAt, setAutoCashoutAt] = useState(2.0);
+  const [isAutoCashoutEnabled, setIsAutoCashoutEnabled] = useState(true);
   const [currentBet, setCurrentBet] = useState<any>(null);
   const [isBetting, setIsBetting] = useState(false);
   const [isCashingOut, setIsCashingOut] = useState(false);

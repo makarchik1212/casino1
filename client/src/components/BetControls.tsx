@@ -19,6 +19,8 @@ interface BetControlsProps {
   isLoading?: boolean;
   variant?: "primary" | "secondary";
   waitingCountdown?: number; // Добавляем обратный отсчет для отображения на кнопке
+  isAutoCashoutEnabled?: boolean; // Флаг включения/выключения автокэшаута
+  onAutoCashoutEnabledChange?: (enabled: boolean) => void; // Хэндлер для изменения состояния
 }
 
 const BetControls = ({
@@ -33,14 +35,21 @@ const BetControls = ({
   isSubmitDisabled = false,
   isLoading = false,
   variant = "primary",
-  waitingCountdown
+  waitingCountdown,
+  isAutoCashoutEnabled = true,
+  onAutoCashoutEnabledChange
 }: BetControlsProps) => {
   const [betInput, setBetInput] = useState(betAmount.toString());
   const [secondaryInput, setSecondaryInput] = useState(
     secondaryValue ? secondaryValue.toString() : ""
   );
-  const [isAutoCashoutEnabled, setIsAutoCashoutEnabled] = useState(true);
+  const [localAutoCashoutEnabled, setLocalAutoCashoutEnabled] = useState(isAutoCashoutEnabled);
   const { playSound } = useSound();
+  
+  // Обновляем локальное состояние когда приходит новое значение извне
+  useEffect(() => {
+    setLocalAutoCashoutEnabled(isAutoCashoutEnabled);
+  }, [isAutoCashoutEnabled]);
   
   // Synchronize with parent component
   useEffect(() => {
@@ -155,12 +164,17 @@ const BetControls = ({
                 htmlFor="enable-auto-cashout" 
                 className="text-xs font-medium text-gray-400 cursor-pointer"
               >
-                {isAutoCashoutEnabled ? "Вкл" : "Выкл"}
+                {localAutoCashoutEnabled ? "Вкл" : "Выкл"}
               </Label>
               <Switch
                 id="enable-auto-cashout"
-                checked={isAutoCashoutEnabled}
-                onCheckedChange={setIsAutoCashoutEnabled}
+                checked={localAutoCashoutEnabled}
+                onCheckedChange={(value) => {
+                  setLocalAutoCashoutEnabled(value);
+                  if (onAutoCashoutEnabledChange) {
+                    onAutoCashoutEnabledChange(value);
+                  }
+                }}
               />
             </div>
           </div>
@@ -168,7 +182,7 @@ const BetControls = ({
             <button 
               className="bg-gray-700 hover:bg-gray-600 rounded-l px-3 py-1 text-xl font-bold"
               onClick={() => handleDecrease('secondary', secondarySuffix === "X" ? 0.25 : 1)}
-              disabled={isLoading || !isAutoCashoutEnabled}
+              disabled={isLoading || !localAutoCashoutEnabled}
             >
               -
             </button>
@@ -178,15 +192,15 @@ const BetControls = ({
                 value={secondaryInput} 
                 onChange={handleSecondaryChange}
                 onBlur={handleSecondaryBlur}
-                className={`bg-gray-700 text-white text-center font-pixel w-full focus:outline-none ${!isAutoCashoutEnabled ? 'opacity-50' : ''}`}
-                disabled={isLoading || !isAutoCashoutEnabled}
+                className={`bg-gray-700 text-white text-center font-pixel w-full focus:outline-none ${!localAutoCashoutEnabled ? 'opacity-50' : ''}`}
+                disabled={isLoading || !localAutoCashoutEnabled}
               />
               <span className="text-white font-pixel pr-2">{secondarySuffix}</span>
             </div>
             <button 
               className="bg-gray-700 hover:bg-gray-600 rounded-r px-3 py-1 text-xl font-bold"
               onClick={() => handleIncrease('secondary', secondarySuffix === "X" ? 0.25 : 1)}
-              disabled={isLoading || !isAutoCashoutEnabled}
+              disabled={isLoading || !localAutoCashoutEnabled}
             >
               +
             </button>
