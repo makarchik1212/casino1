@@ -116,45 +116,23 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
     };
   }, [multiplier, isLive, hasCrashed]);
   
-  // Управление обратным отсчетом только между играми, а не после краша
+  // Управление обратным отсчетом от переданного значения с сервера
   useEffect(() => {
-    // Только когда идет между игр (!isLive && !hasCrashed)
+    // Сбрасываем высоту графика и позицию звезды когда не в игре
     if (!isLive && !hasCrashed) {
-      // Сбрасываем высоту графика
       setHeight(0);
       setStarPosition(100); // Reset star to bottom
-      
-      // Запустить обратный отсчет времени до следующей игры
-      setCountdown(10); // Сбросить счетчик при начале нового отсчета
-      
-      // Очистить предыдущий интервал, если он существует
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current);
-      }
-      
-      // Запустить новый интервал для обратного отсчета
-      countdownIntervalRef.current = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            // Остановить обратный отсчет, когда он достигнет 0
-            if (countdownIntervalRef.current) {
-              clearInterval(countdownIntervalRef.current);
-              countdownIntervalRef.current = null;
-            }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
     }
     
-    // Очистка при размонтировании
-    return () => {
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current);
-      }
-    };
-  }, [isLive, hasCrashed]);
+    // Если нам передали waitingCountdown с сервера, используем его
+    if (waitingCountdown !== undefined) {
+      setCountdown(waitingCountdown);
+    }
+    // Если режим ожидания закончился, сбрасываем счетчик
+    else if (!waitingForBets && isLive) {
+      setCountdown(0);
+    }
+  }, [isLive, hasCrashed, waitingForBets, waitingCountdown]);
   
   return (
     <div className="crash-graph mb-4 bg-ui-medium rounded-md relative overflow-hidden border border-ui-dark">

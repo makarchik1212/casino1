@@ -23,6 +23,8 @@ const CrashGame = () => {
   const [currentMultiplier, setCurrentMultiplier] = useState(1.0);
   const [isLive, setIsLive] = useState(false);
   const [hasCrashed, setHasCrashed] = useState(false);
+  const [waitingForBets, setWaitingForBets] = useState(false);
+  const [waitingCountdown, setWaitingCountdown] = useState<number | undefined>(undefined);
   const [recentResults, setRecentResults] = useState<number[]>([]);
   
   // Bet state
@@ -46,8 +48,20 @@ const CrashGame = () => {
         // Update multiplier and game state
         setCurrentMultiplier(gameState.currentMultiplier);
         
+        // Check if we're in the waiting period between games
+        if (gameState.waitingForBets) {
+          setWaitingForBets(true);
+          setIsLive(false);
+          setHasCrashed(false);
+          
+          if (gameState.waitingCountdown !== undefined) {
+            setWaitingCountdown(gameState.waitingCountdown);
+          }
+        }
         // Check if game is live
-        if (gameState.currentCrashGame && !gameState.currentCrashGame.hasEnded) {
+        else if (gameState.currentCrashGame && !gameState.currentCrashGame.hasEnded) {
+          setWaitingForBets(false);
+          setWaitingCountdown(undefined);
           setIsLive(true);
           setHasCrashed(false);
           
@@ -322,6 +336,8 @@ const CrashGame = () => {
                 multiplier={currentMultiplier} 
                 isLive={isLive}
                 hasCrashed={hasCrashed}
+                waitingForBets={waitingForBets}
+                waitingCountdown={waitingCountdown}
               />
             )}
           </PixelCard>
@@ -348,7 +364,9 @@ const CrashGame = () => {
               isSubmitDisabled={
                 (currentBet && (!isLive || hasCrashed)) || 
                 (!currentBet && isLive) ||
-                !user
+                !user ||
+                // Enable betting only when we're waiting for bets between games
+                (!waitingForBets && !currentBet)
               }
               isLoading={isBetting || isCashingOut}
               variant={currentBet && isLive ? "secondary" : "primary"}

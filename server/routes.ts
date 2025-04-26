@@ -492,9 +492,10 @@ function startCrashGameTimer(
     
     // Calculate how long the game should last in milliseconds
     // The duration increases with higher crash points to build tension
-    // Base duration is 3 seconds (representing a 1.0x multiplier)
-    const baseDuration = 3000; // 3 seconds
-    const duration = baseDuration * Math.log2(crashPoint + 1);
+    // Increase base duration to slow down the game (from 3 seconds to 5 seconds)
+    const baseDuration = 5000; // 5 seconds
+    // Use a slower logarithmic growth to make the game last longer
+    const duration = baseDuration * Math.log2(crashPoint + 2); // Add 2 instead of 1 to slow down even more
     
     // Start time
     const startTime = Date.now();
@@ -506,8 +507,11 @@ function startCrashGameTimer(
         const currentTime = Date.now();
         
         // Calculate current multiplier based on elapsed time
+        // Use a non-linear curve for slower start and acceleration at the end
         const elapsedRatio = (currentTime - startTime) / duration;
-        let currentMultiplier = 1 + (crashPoint - 1) * elapsedRatio;
+        // Cubic easing for smoother progression (starts slower)
+        const easedRatio = Math.pow(elapsedRatio, 1.5); // Use power of 1.5 for slightly slower growth
+        let currentMultiplier = 1 + (crashPoint - 1) * easedRatio;
         
         // Round to 2 decimal places
         currentMultiplier = Math.floor(currentMultiplier * 100) / 100;
