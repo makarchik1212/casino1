@@ -201,18 +201,21 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
               <StarIcon size={38} />
             </div>
             
-            {/* Coefficient directly on the star */}
+            {/* Удален черный коэффициент на звезде */}
+            
+            {/* Возвращаем желтый коэффициент под звездой */}
             <div 
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-pixel text-ui-dark font-bold"
+              className="mt-1 font-pixel text-accent bg-ui-dark bg-opacity-80 px-2 py-1 rounded whitespace-nowrap"
               style={{
-                fontSize: '10px',
-                textShadow: '0px 0px 2px white, 0px 0px 2px white'
+                borderLeft: multiplier >= 2 ? '2px solid #FFD700' : 'none',
+                boxShadow: multiplier >= 3 ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none',
+                fontSize: multiplier >= 2 ? '18px' : '16px'
               }}
             >
-              {multiplier.toFixed(2)}
+              <span className="text-accent">
+                {multiplier.toFixed(2)}x
+              </span>
             </div>
-            
-            {/* Удалена вторая анимация коэффициента под звездой */}
           </div>
         </div>
       )}
@@ -228,9 +231,10 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
           {/* Таймер обратного отсчета, который сразу появляется после краша */}
           <div className="bg-ui-dark px-6 py-3 rounded-lg font-pixel text-white text-center">
             <div className="mb-1 text-accent animate-pulse-slow">NEXT ROUND IN</div>
-            <div className="mt-2 text-3xl text-accent font-pixel relative">
-              <span className="animate-pulse-slow">{countdown}</span>
-              <span className="text-sm ml-1">s</span>
+            {/* Таймер обратного отсчета с анимацией */}
+            <div className="mt-2 text-3xl font-pixel relative">
+              <span className="animate-timer">{countdown}</span>
+              <span className="text-sm ml-1 text-accent">s</span>
             </div>
           </div>
         </div>
@@ -242,10 +246,10 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
             <div className="mb-1 text-accent animate-pulse-slow">PLACE YOUR BETS NOW!</div>
             <div className="text-sm">NEXT ROUND STARTING IN</div>
             
-            {/* Таймер обратного отсчета */}
-            <div className="mt-2 text-3xl text-accent font-pixel relative">
-              <span className="animate-pulse-slow">{countdown}</span>
-              <span className="text-sm ml-1">s</span>
+            {/* Таймер обратного отсчета с анимацией */}
+            <div className="mt-2 text-3xl font-pixel relative">
+              <span className="animate-timer">{countdown}</span>
+              <span className="text-sm ml-1 text-accent">s</span>
             </div>
           </div>
           <div className="flex items-center gap-2 bg-ui-dark bg-opacity-80 px-4 py-2 rounded-lg mt-2">
