@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { getCrashGraphHeight } from "@/lib/game-logic";
 import { useSound } from "@/contexts/SoundContext";
 import crashSound from "@/assets/sounds/crash";
-import starImage from "@/assets/images/star-image.png";
+import starRocketImage from "@/assets/images/star-rocket.png";
 
 interface CrashGraphProps {
   multiplier: number;
@@ -220,18 +220,14 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
               {/* Свечение */}
               <div className="absolute -inset-1 bg-yellow-400 rounded-full opacity-30 animate-pulse-slow blur-md"></div>
               
-              {/* Звезда */}
+              {/* Новая звезда-ракета */}
               <img 
-                src={starImage} 
+                src={starRocketImage} 
                 className="w-16 h-16 object-contain" 
-                alt="Star" 
+                alt="Star rocket" 
               />
               
-              {/* "Двигатель" */}
-              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80">
-                <div className="w-1 h-8 bg-gradient-to-t from-yellow-500 via-orange-500 to-transparent rounded-full animate-flicker"></div>
-                <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-yellow-400 blur-sm rounded-full animate-pulse"></div>
-              </div>
+              {/* "Двигатель" уже встроен в изображение */}
             </div>
             
             {/* Отображение коэффициента */}
