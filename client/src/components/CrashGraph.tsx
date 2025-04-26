@@ -9,6 +9,8 @@ interface CrashGraphProps {
   multiplier: number;
   isLive: boolean;
   hasCrashed: boolean;
+  waitingForBets?: boolean;
+  waitingCountdown?: number;
 }
 
 interface StarTrail {
@@ -18,7 +20,7 @@ interface StarTrail {
   size: number;
 }
 
-const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
+const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCountdown }: CrashGraphProps) => {
   const [height, setHeight] = useState(0);
   const [starPosition, setStarPosition] = useState(100); // Position from the bottom (%)
   const [trails, setTrails] = useState<StarTrail[]>([]);

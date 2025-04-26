@@ -543,18 +543,37 @@ function startCrashGameTimer(
                 const newCrashPoint = generateCrashPoint();
                 const newGame = await storage.createCrashGame({ crashPoint: newCrashPoint });
                 
-                // Update game state with new game
+                // Update game state with new game - включаем режим ожидания перед игрой
                 updateGameState({
                   type: "crash_new_game",
-                  gameId: newGame.id
+                  gameId: newGame.id,
+                  waitingForBets: true,
+                  waitingCountdown: 10
                 });
                 
-                // Start timer for new game
-                startCrashGameTimer(newGame.id, newCrashPoint, updateGameState);
+                // Добавляем обратный отсчет перед началом игры (10 секунд)
+                let countdown = 10;
+                const countdownInterval = setInterval(() => {
+                  countdown--;
+                  
+                  // Отправляем обновление каждую секунду с обратным отсчетом
+                  updateGameState({
+                    type: "crash_waiting",
+                    gameId: newGame.id,
+                    waitingCountdown: countdown
+                  });
+                  
+                  // Когда отсчет закончился, начинаем игру
+                  if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    // Start timer for new game
+                    startCrashGameTimer(newGame.id, newCrashPoint, updateGameState);
+                  }
+                }, 1000);
               } catch (err) {
                 console.error("Error starting new crash game:", err);
               }
-            }, 10000); // 10 second pause between games to allow bet placements
+            }, 3000); // сокращаем паузу до 3 секунд, т.к. добавили 10 секунд отсчета
           } catch (err) {
             console.error("Error ending crash game:", err);
           }
