@@ -22,7 +22,9 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
   const [height, setHeight] = useState(0);
   const [starPosition, setStarPosition] = useState(100); // Position from the bottom (%)
   const [trails, setTrails] = useState<StarTrail[]>([]);
+  const [countdown, setCountdown] = useState<number>(10); // Счетчик для отсчета 10 секунд
   const animationFrameRef = useRef<number>();
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const prevMultiplierRef = useRef(1);
   const { playSound } = useSound();
   
@@ -80,13 +82,21 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
           return newHeight;
         });
         
-        // Update star position to move up with the increasing multiplier
+        // Update star position to move up from bottom (100%) to center (50%)
         setStarPosition(prev => {
-          // Enhanced upward movement - more dramatic rise
-          // Star moves from bottom (100%) to top (0%) as multiplier increases
-          // Using a quadratic formula to accelerate upward movement
-          const moveSpeed = multiplier > 3 ? 15 : 10; // Faster at higher multipliers
-          const newPosition = Math.max(0, 100 - Math.pow(multiplier, 1.2) * moveSpeed / multiplier);
+          // Configure star to start from bottom (100%) and move to center (50%)
+          // Star stops at the center (50%) regardless of multiplier value
+          const center = 50;
+          const startPos = 100;
+          
+          // Value between 0 and 1 representing progress toward target
+          // Use eased movement for smoother animation
+          const progressFactor = Math.min(1, (multiplier - 1) * 0.4); // Slower movement to center
+          
+          // Calculate new position with easing
+          const easing = 1 - Math.pow(1 - progressFactor, 3); // Cubic easing
+          const newPosition = startPos - (startPos - center) * easing;
+          
           return newPosition;
         });
       };
@@ -109,7 +119,37 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
     if (!isLive && !hasCrashed) {
       setHeight(0);
       setStarPosition(100); // Reset star to bottom
+      
+      // Запустить обратный отсчет времени до следующей игры
+      setCountdown(10); // Сбросить счетчик при начале нового отсчета
+      
+      // Очистить предыдущий интервал, если он существует
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+      
+      // Запустить новый интервал для обратного отсчета
+      countdownIntervalRef.current = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            // Остановить обратный отсчет, когда он достигнет 0
+            if (countdownIntervalRef.current) {
+              clearInterval(countdownIntervalRef.current);
+              countdownIntervalRef.current = null;
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
+    
+    // Очистка при размонтировании
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+    };
   }, [isLive, hasCrashed]);
   
   return (
@@ -140,40 +180,51 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
         </div>
       ))}
       
-      {/* Flying Star Animation with Multiplier */}
+      {/* Flying Star Animation with Multiplier directly on the star */}
       {isLive && !hasCrashed && (
         <div 
           className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-300 ease-out animate-pulse-slow"
           style={{ 
-            bottom: `${starPosition}%`,
+            bottom: `${Math.min(50, starPosition)}%`, // Max at 50% height (center of screen)
             filter: `drop-shadow(0 0 ${Math.min(15, 5 + multiplier/2)}px rgba(255, 215, 0, 0.8))`,
             zIndex: 10, // Ensure main star is above trails
             transform: `translate(-50%) scale(${Math.min(1.3, 1 + multiplier/25)})` // Grow slightly with multiplier
           }}
         >
-          <div className="animate-spin-slow">
-            <StarIcon size={32} />
-          </div>
-          <div 
-            className="absolute top-0 left-full ml-2 font-pixel text-white bg-ui-dark bg-opacity-70 px-2 py-1 rounded text-lg whitespace-nowrap"
-            style={{
-              borderLeft: multiplier >= 2 ? '2px solid #FFD700' : 'none',
-              boxShadow: multiplier >= 3 ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none'
-            }}
-          >
-            <span className={multiplier >= 2 ? 'text-accent' : 'text-white'}>
-              {multiplier.toFixed(2)}x
-            </span>
+          <div className="relative flex flex-col items-center">
+            <div className="animate-spin-slow">
+              <StarIcon size={38} />
+            </div>
+            
+            {/* Coefficient directly on the star */}
+            <div 
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-pixel text-ui-dark font-bold"
+              style={{
+                fontSize: '10px',
+                textShadow: '0px 0px 2px white, 0px 0px 2px white'
+              }}
+            >
+              {multiplier.toFixed(2)}
+            </div>
+            
+            {/* Larger multiplier display below star */}
+            <div 
+              className="mt-1 font-pixel text-white bg-ui-dark bg-opacity-80 px-2 py-1 rounded whitespace-nowrap"
+              style={{
+                borderLeft: multiplier >= 2 ? '2px solid #FFD700' : 'none',
+                boxShadow: multiplier >= 3 ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none',
+                fontSize: multiplier >= 2 ? '18px' : '16px'
+              }}
+            >
+              <span className={multiplier >= 2 ? 'text-accent' : 'text-white'}>
+                {multiplier.toFixed(2)}x
+              </span>
+            </div>
           </div>
         </div>
       )}
       
-      <div className={cn(
-        "text-accent font-pixel text-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2",
-        isLive && !hasCrashed && "blink"
-      )}>
-        {multiplier.toFixed(2)}x
-      </div>
+      {/* Большой коэффициент отображается вместе со звездой, поэтому здесь он не нужен */}
       
       {hasCrashed && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
@@ -187,9 +238,15 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
           <div className="bg-ui-dark px-6 py-3 rounded-lg font-pixel text-white text-center mb-2">
             <div className="mb-1 text-accent animate-pulse-slow">PLACE YOUR BETS NOW!</div>
-            <div className="text-sm">NEXT ROUND STARTING SOON</div>
+            <div className="text-sm">NEXT ROUND STARTING IN</div>
+            
+            {/* Таймер обратного отсчета */}
+            <div className="mt-2 text-3xl text-accent font-pixel relative">
+              <span className="animate-pulse-slow">{countdown}</span>
+              <span className="text-sm ml-1">s</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 bg-ui-dark bg-opacity-80 px-4 py-2 rounded-lg">
+          <div className="flex items-center gap-2 bg-ui-dark bg-opacity-80 px-4 py-2 rounded-lg mt-2">
             <div className="w-3 h-3 bg-secondary rounded-full animate-pulse"></div>
             <div className="w-3 h-3 bg-secondary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
             <div className="w-3 h-3 bg-secondary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
