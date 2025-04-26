@@ -156,12 +156,16 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
   
   return (
     <div className="crash-graph mb-4 bg-ui-medium rounded relative overflow-hidden">
+      {/* Линия графика с более плавной анимацией и градиентом */}
       <div 
         className={cn(
-          "crash-line transition-all duration-100",
-          hasCrashed && "bg-primary"
+          "crash-line transition-all duration-300 ease-out",
+          hasCrashed ? "bg-crash-line-crashed" : "bg-crash-line"
         )} 
-        style={{ height: `${height}%` }}
+        style={{ 
+          height: `${height}%`,
+          transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)"
+        }}
       />
       
       {/* Star Trails */}
@@ -182,34 +186,45 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
         </div>
       ))}
       
-      {/* Flying Star Animation with Multiplier directly on the star */}
+      {/* Rocket/Star Animation (Cobalt Lab style) */}
       {isLive && !hasCrashed && (
         <div 
-          className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-300 ease-out animate-pulse-slow"
+          className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-200"
           style={{ 
             bottom: `${Math.min(50, starPosition)}%`, // Max at 50% height (center of screen)
-            filter: `drop-shadow(0 0 ${Math.min(15, 5 + multiplier/2)}px rgba(255, 215, 0, 0.8))`,
-            zIndex: 10, // Ensure main star is above trails
-            transform: `translate(-50%) scale(${Math.min(1.3, 1 + multiplier/25)})` // Grow slightly with multiplier
+            filter: `drop-shadow(0 0 ${Math.min(20, 5 + multiplier/2)}px rgba(255, 215, 0, 0.7))`,
+            zIndex: 10, // Ensure star is above graph line
+            transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
           }}
         >
           <div className="relative flex flex-col items-center">
-            <div className="animate-spin-slow">
-              <StarIcon size={38} />
-            </div>
-            
-            {/* Удален черный коэффициент на звезде */}
-            
-            {/* Возвращаем желтый коэффициент под звездой */}
+            {/* Main star with glow effect - larger and more dramatic */}
             <div 
-              className="mt-1 font-pixel text-accent bg-ui-dark bg-opacity-80 px-2 py-1 rounded whitespace-nowrap"
+              className="animate-spin-slow relative"
               style={{
-                borderLeft: multiplier >= 2 ? '2px solid #FFD700' : 'none',
-                boxShadow: multiplier >= 3 ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none',
-                fontSize: multiplier >= 2 ? '18px' : '16px'
+                transform: `scale(${Math.min(1.5, 1 + multiplier/15)})`, // Grow more dramatically with multiplier
               }}
             >
-              <span className="text-accent">
+              <div className="absolute -inset-1 bg-accent rounded-full opacity-20 animate-pulse-slow blur-md"></div>
+              <StarIcon size={45} />
+              
+              {/* Spark/trail effects */}
+              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80">
+                <div className="w-1 h-6 bg-gradient-to-t from-accent to-transparent rounded-full"></div>
+              </div>
+            </div>
+            
+            {/* Coefficient display - more stylized and modern */}
+            <div 
+              className="mt-3 font-pixel text-accent bg-ui-dark bg-opacity-90 px-3 py-1.5 rounded-md whitespace-nowrap border border-accent/30"
+              style={{
+                boxShadow: multiplier >= 2 ? '0 0 15px rgba(255, 215, 0, 0.3)' : 'none',
+                fontSize: Math.min(24, 16 + (multiplier / 2)) + 'px', // Dynamic sizing based on multiplier
+                transform: multiplier >= 3 ? 'scale(1.05)' : 'scale(1)',
+                transition: 'all 0.2s'
+              }}
+            >
+              <span className={multiplier >= 2 ? "text-accent font-bold" : "text-accent"}>
                 {multiplier.toFixed(2)}x
               </span>
             </div>
@@ -219,10 +234,52 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
       
       {/* Большой коэффициент отображается вместе со звездой, поэтому здесь он не нужен */}
       
+      {/* Enhanced Crash Effect with Explosions (Cobalt Lab style) */}
       {hasCrashed && (
         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-          <div className="bg-primary px-4 py-2 rounded font-pixel text-white animate-bounce">
-            CRASHED!
+          {/* Main crash message with explosion effects */}
+          <div className="relative">
+            {/* Background glow/explosion */}
+            <div className="absolute inset-0 bg-primary rounded-full animate-pulse opacity-70 blur-xl" 
+                style={{ transform: 'scale(2)' }}></div>
+                
+            {/* Explosion particles - more dynamic with random sizes and directions */}
+            {Array.from({length: 12}).map((_, i) => {
+              // Create random directions for particles
+              const angle = Math.random() * 360;
+              const distance = 30 + Math.random() * 70;
+              const size = 2 + Math.random() * 3;
+              const delay = Math.random() * 0.2;
+              
+              // Assign random custom properties for the animation
+              const style = {
+                '--x': `${Math.cos(angle * (Math.PI/180)) * distance}px`,
+                '--y': `${Math.sin(angle * (Math.PI/180)) * distance}px`,
+              } as React.CSSProperties;
+              
+              return (
+                <div 
+                  key={i}
+                  className="absolute bg-accent rounded-full animate-explosion-particle" 
+                  style={{
+                    left: '50%',
+                    top: '50%',
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    opacity: 0.8,
+                    transform: 'translate(-50%, -50%)',
+                    animationDelay: `${delay}s`,
+                    ...style
+                  }}
+                ></div>
+              );
+            })}
+            
+            {/* Main crash text */}
+            <div className="bg-primary px-6 py-3 rounded-lg font-pixel text-white z-20 relative animate-shake">
+              <span className="text-xl font-bold">CRASHED!</span>
+              <span className="block text-2xl font-bold">{multiplier.toFixed(2)}x</span>
+            </div>
           </div>
         </div>
       )}
