@@ -96,6 +96,7 @@ const CrashGame = () => {
             
             // If we had a bet and didn't cash out, mark it as lost
             if (currentBet && !currentBet.cashedOut) {
+              // Сбрасываем текущую ставку после краша, чтобы разрешить новую ставку
               setCurrentBet(null);
               try {
                 toast({
@@ -161,6 +162,7 @@ const CrashGame = () => {
         if (data && !data.hasEnded) {
           setIsLive(true);
           setHasCrashed(false);
+          setCurrentMultiplier(1.0); // Сбрасываем коэффициент для новой игры
         }
         
         // Set loading to false
@@ -283,8 +285,13 @@ const CrashGame = () => {
       return;
     }
     
+    // Когда игра крашнулась, сбрасываем предыдущую ставку
+    if (hasCrashed && currentBet) {
+      setCurrentBet(null);
+    }
+    
     // Убираем проверку на isLive, теперь можно делать ставки в любой момент
-    if (currentBet) {
+    if (currentBet && !hasCrashed) {
       toast({
         title: "Bet Already Placed",
         description: "You already have an active bet for this round.",
