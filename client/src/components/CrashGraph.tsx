@@ -33,6 +33,10 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
     }
   }, [multiplier, isLive, hasCrashed]);
   
+  // Стейты для анимации взрыва
+  const [showExplosion, setShowExplosion] = useState(false);
+  const [redGlow, setRedGlow] = useState(false);
+
   // Эффект для анимации звезды и линии графика (оптимизированный)
   useEffect(() => {
     if (isLive && !hasCrashed) {
@@ -71,9 +75,17 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
       
       // Запускаем анимацию
       animationFrameRef.current = requestAnimationFrame(animate);
+
+      // Сбрасываем эффекты взрыва при новой игре
+      setRedGlow(false);
+      setShowExplosion(false);
     } else if (hasCrashed) {
       // Звук краша
       playSound(crashSound);
+      
+      // Активируем эффекты взрыва
+      setShowExplosion(true);
+      setRedGlow(true);
     }
     
     // Очистка
@@ -93,7 +105,15 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
   }, [isLive]);
   
   return (
-    <div className="crash-graph mb-4 bg-ui-medium rounded-md relative overflow-hidden border border-ui-dark">
+    <div className={cn(
+      "crash-graph mb-4 bg-ui-medium rounded-md relative overflow-hidden border border-ui-dark",
+      redGlow && "red-glow-animation" 
+    )}>
+      {/* Красное свечение по всему экрану при крашах */}
+      {redGlow && (
+        <div className="absolute inset-0 bg-red-600/40 z-20 animate-red-pulse pointer-events-none"></div>
+      )}
+
       {/* Фоновая сетка */}
       <div className="absolute inset-0 grid grid-cols-5 grid-rows-5 opacity-20 pointer-events-none">
         {Array.from({ length: 25 }).map((_, i) => (
@@ -115,6 +135,41 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
           transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)"
         }}
       />
+
+      {/* Анимация взрыва звезды */}
+      {showExplosion && (
+        <div className="absolute left-1/2 z-30"
+          style={{ 
+            bottom: `${Math.min(50, starPosition)}%`,
+            transform: "translate(-50%, 50%)"
+          }}
+        >
+          <div className="absolute inset-0 w-40 h-40 -translate-x-1/2 -translate-y-1/2">
+            {/* Лучи взрыва */}
+            <div className="absolute w-40 h-40 animate-star-explosion">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div 
+                  key={i}
+                  className="absolute w-2 h-16 bg-gradient-to-r from-red-600 via-yellow-500 to-orange-500 rounded"
+                  style={{
+                    left: '50%',
+                    top: '50%',
+                    transformOrigin: 'center bottom',
+                    transform: `rotate(${i * 30}deg) translateY(-100%)`,
+                    opacity: 0.8,
+                    filter: 'blur(2px)'
+                  }}
+                />
+              ))}
+            </div>
+            
+            {/* Круговое свечение */}
+            <div className="absolute w-32 h-32 bg-red-600/60 -translate-x-1/2 -translate-y-1/2 rounded-full animate-expand-fade"></div>
+            <div className="absolute w-24 h-24 bg-yellow-500/80 -translate-x-1/2 -translate-y-1/2 rounded-full animate-expand-fade delay-100"></div>
+            <div className="absolute w-16 h-16 bg-white/90 -translate-x-1/2 -translate-y-1/2 rounded-full animate-expand-fade delay-200"></div>
+          </div>
+        </div>
+      )}
       
       {/* Звезда и коэффициент */}
       {isLive && !hasCrashed && (
@@ -170,7 +225,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-start z-40 pt-20">
           <div className="relative">
             {/* Свечение */}
-            <div className="absolute inset-0 bg-yellow-500 rounded-full animate-pulse opacity-60 blur-xl" 
+            <div className="absolute inset-0 bg-red-600 rounded-full animate-pulse-fast opacity-70 blur-xl" 
                 style={{ transform: 'scale(3)' }}></div>
             
             {/* Текст */}
@@ -185,7 +240,7 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
       {/* Таймер обратного отсчета замещает коэффициент когда игра не активна */}
       {waitingCountdown !== undefined && !isLive && (
         <div className="absolute top-[40%] left-0 w-full flex justify-center z-30">
-          <div className="font-pixel text-6xl font-bold text-yellow-400 animate-countdown">
+          <div className="font-pixel text-6xl font-bold text-yellow-400 animate-pulse-slow">
             {waitingCountdown}
           </div>
         </div>

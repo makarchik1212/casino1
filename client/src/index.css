@@ -269,14 +269,102 @@
     background: rgba(239, 68, 68, 0.7);
   }
   
-  /* Для анимации пульсации таймера обратного отсчета */
+  /* Анимации для краша и эффектов */
+
+/* Для анимации пульсации таймера обратного отсчета */
 @keyframes pulse-countdown {
   0%, 100% { opacity: 1; text-shadow: 0 0 15px rgba(255, 140, 0, 0.8); transform: scale(1); }
   50% { opacity: 0.8; text-shadow: 0 0 25px rgba(255, 140, 0, 1); transform: scale(1.2); }
 }
 
+/* Красная пульсация для эффекта взрыва */
+@keyframes red-pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.4; }
+}
+
+/* Расширение и исчезновение для эффектов взрыва */
+@keyframes expand-fade {
+  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+
+/* Анимация лучей взрыва звезды */
+@keyframes star-explosion {
+  0% { transform: scale(0.3) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.2) rotate(45deg); opacity: 0.8; }
+  100% { transform: scale(2) rotate(90deg); opacity: 0; }
+}
+
+/* Медленная пульсация */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Быстрая пульсация */
+@keyframes pulse-fast {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+/* Применение анимаций */
 .animate-countdown {
   animation: pulse-countdown 1s infinite;
+}
+
+.animate-red-pulse {
+  animation: red-pulse 0.5s infinite;
+}
+
+.animate-expand-fade {
+  animation: expand-fade 0.8s forwards;
+}
+
+.animate-star-explosion {
+  animation: star-explosion 0.8s forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s infinite;
+}
+
+.animate-pulse-fast {
+  animation: pulse-fast 0.3s infinite;
+}
+
+/* Эффект тряски для текста "CRASHED" */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Эффект красного свечения всего компонента при крахе */
+.red-glow-animation {
+  box-shadow: 0 0 20px 5px rgba(255, 0, 0, 0.6), 0 0 40px 10px rgba(255, 0, 0, 0.3) !important;
+  transition: box-shadow 0.3s ease-out;
+}
+
+/* Эффект легкой покачки звезды */
+@keyframes subtle-wobble {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.animate-subtle-wobble {
+  animation: subtle-wobble 2s ease-in-out infinite;
+}
+
+/* Эффект мерцания "двигателя" звезды */
+@keyframes flicker {
+  0%, 100% { opacity: 0.7; height: 8px; }
+  50% { opacity: 0.9; height: 10px; }
 }
 
 /* Специальный стиль для таймера в стиле Cobalt Lab */
@@ -372,14 +460,10 @@
     animation: flicker 0.3s infinite;
   }
   
-  /* Плавное покачивание для звезды при высоких коэффициентах (как на Cobalt Lab) */
-  @keyframes subtle-wobble {
+  /* Обновленное плавное покачивание для звезды при высоких коэффициентах */
+  @keyframes subtle-wobble-updated {
     0% { transform: rotate(-1deg); }
     50% { transform: rotate(1deg); }
     100% { transform: rotate(-1deg); }
-  }
-  
-  .animate-subtle-wobble {
-    animation: subtle-wobble 0.8s ease-in-out infinite;
   }
 }
