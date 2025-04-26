@@ -175,20 +175,15 @@ const BetControls = ({
         </div>
       )}
       
-      {/* Submit Button - Full Width с отображением таймера */}
+      {/* Submit Button - Full Width без таймера вообще */}
       <div className="col-span-2 mt-2">
         <PixelButton
           variant={variant}
-          className={`w-full py-3 font-pixel text-lg uppercase ${waitingCountdown !== undefined ? "bg-red-600 animate-pulse-slow" : ""}`}
+          className={`w-full py-3 font-pixel text-lg uppercase`}
           onClick={handleSubmit}
           disabled={isSubmitDisabled || isLoading || waitingCountdown !== undefined}
         >
-          {isLoading 
-            ? "LOADING..." 
-            : waitingCountdown !== undefined && waitingCountdown > 0
-              ? `${submitLabel} (${waitingCountdown}s)`
-              : submitLabel
-          }
+          {isLoading ? "LOADING..." : submitLabel}
         </PixelButton>
       </div>
     </div>
