@@ -18,9 +18,11 @@ interface BetControlsProps {
   isSubmitDisabled?: boolean;
   isLoading?: boolean;
   variant?: "primary" | "secondary";
-  waitingCountdown?: number; // Добавляем обратный отсчет для отображения на кнопке
+  waitingCountdown?: number; // Обратный отсчет для отображения на кнопке
   isAutoCashoutEnabled?: boolean; // Флаг включения/выключения автокэшаута
   onAutoCashoutEnabledChange?: (enabled: boolean) => void; // Хэндлер для изменения состояния
+  potentialWin?: number; // Потенциальный выигрыш при текущем коэффициенте
+  currentMultiplier?: number; // Текущий коэффициент для обновления потенциального выигрыша
 }
 
 const BetControls = ({
@@ -37,7 +39,9 @@ const BetControls = ({
   variant = "primary",
   waitingCountdown,
   isAutoCashoutEnabled = true,
-  onAutoCashoutEnabledChange
+  onAutoCashoutEnabledChange,
+  potentialWin = 0,
+  currentMultiplier = 1.0
 }: BetControlsProps) => {
   const [betInput, setBetInput] = useState(betAmount.toString());
   const [secondaryInput, setSecondaryInput] = useState(
@@ -91,7 +95,11 @@ const BetControls = ({
   };
   
   const handleIncrease = (type: 'bet' | 'secondary', amount: number) => {
-    playSound(clickSound);
+    try {
+      playSound(clickSound);
+    } catch (error) {
+      console.log("Не удалось воспроизвести звук", error);
+    }
     
     if (type === 'bet') {
       const newValue = Math.max(10, betAmount + amount);
@@ -103,7 +111,11 @@ const BetControls = ({
   };
   
   const handleDecrease = (type: 'bet' | 'secondary', amount: number) => {
-    playSound(clickSound);
+    try {
+      playSound(clickSound);
+    } catch (error) {
+      console.log("Не удалось воспроизвести звук", error);
+    }
     
     if (type === 'bet') {
       const newValue = Math.max(10, betAmount - amount);
@@ -115,8 +127,39 @@ const BetControls = ({
   };
   
   const handleSubmit = () => {
-    playSound(clickSound);
+    try {
+      playSound(clickSound);
+    } catch (error) {
+      console.log("Не удалось воспроизвести звук", error);
+    }
     onSubmit();
+  };
+  
+  // Рассчитываем актуальный потенциальный выигрыш на основе текущего коэффициента
+  // Это ключевая функция для отображения выигрыша в стиле Cobalt Lab
+  const calculateCurrentPotentialWin = () => {
+    if (variant === "secondary" && currentMultiplier > 1) {
+      // Если это режим кешаута (игра уже идет), показываем актуальный выигрыш
+      return Math.floor(betAmount * currentMultiplier);
+    }
+    return potentialWin;
+  };
+  
+  // Вычисляем прибыль (для отображения в скобках)
+  const calculateProfit = () => {
+    const win = calculateCurrentPotentialWin();
+    return win - betAmount;
+  };
+
+  // Форматирование для отображения выигрыша с плюсом для профита
+  const formatWinDisplay = () => {
+    const win = calculateCurrentPotentialWin();
+    const profit = calculateProfit();
+    
+    if (variant === "secondary" && currentMultiplier > 1) {
+      return `CASHOUT ${win} (+${profit})`;
+    }
+    return submitLabel;
   };
   
   return (
@@ -208,7 +251,7 @@ const BetControls = ({
         </div>
       )}
       
-      {/* Submit Button - Full Width без таймера вообще */}
+      {/* Submit Button - с отображением выигрыша в стиле Cobalt Lab */}
       <div className="col-span-2 mt-2">
         <PixelButton
           variant={variant}
@@ -216,9 +259,18 @@ const BetControls = ({
           onClick={handleSubmit}
           disabled={isSubmitDisabled || isLoading}
         >
-          {isLoading ? "LOADING..." : submitLabel}
+          {isLoading ? "LOADING..." : variant === "secondary" ? formatWinDisplay() : submitLabel}
         </PixelButton>
       </div>
+      
+      {/* Отображение таймера обратного отсчета если он есть */}
+      {waitingCountdown !== undefined && waitingCountdown > 0 && (
+        <div className="col-span-2 mt-2 flex justify-center items-center">
+          <div className="text-yellow-400 font-pixel text-xl animate-countdown">
+            Следующая игра через: {waitingCountdown}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

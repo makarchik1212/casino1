@@ -6,6 +6,7 @@ import { useSound } from "@/contexts/SoundContext";
 import { useToast } from "@/hooks/use-toast";
 import CrashGraph from "@/components/CrashGraph";
 import BetControls from "@/components/BetControls";
+import CrashBetList from "@/components/CrashBetList";
 import GameHistory from "@/components/GameHistory";
 import { PixelCard } from "@/components/ui/pixel-card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -358,7 +359,7 @@ const CrashGame = () => {
               PLACE YOUR BET
             </h3>
             
-            {/* Game Controls */}
+            {/* Game Controls с системой ставок как на Cobalt Lab */}
             <BetControls
               betAmount={betAmount}
               onBetChange={setBetAmount}
@@ -367,7 +368,7 @@ const CrashGame = () => {
               secondaryLabel="AUTO CASHOUT AT"
               secondarySuffix="X"
               submitLabel={currentBet && isLive 
-                ? `CASHOUT ${Math.floor(currentBet.betAmount * currentMultiplier)} (+${Math.floor(currentBet.betAmount * currentMultiplier - currentBet.betAmount)})` 
+                ? "CASHOUT" 
                 : "PLACE BET"}
               onSubmit={currentBet && isLive ? handleCashout : handlePlaceBet}
               isSubmitDisabled={
@@ -380,6 +381,10 @@ const CrashGame = () => {
               waitingCountdown={waitingCountdown}
               isAutoCashoutEnabled={isAutoCashoutEnabled}
               onAutoCashoutEnabledChange={setIsAutoCashoutEnabled}
+              // Передаем текущий коэффициент для динамического обновления потенциального выигрыша
+              currentMultiplier={currentMultiplier}
+              // Передаем текущую ставку для расчета потенциального выигрыша
+              potentialWin={currentBet ? Math.floor(currentBet.betAmount * currentMultiplier) : 0}
             />
           </PixelCard>
         </div>
