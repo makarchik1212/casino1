@@ -29,23 +29,35 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
   // Effect to create star trails when multiplier increases
   useEffect(() => {
     if (isLive && !hasCrashed && multiplier > prevMultiplierRef.current) {
-      // Only add trails when multiplier increases
-      if (multiplier >= 1.5) {
-        // Create a new trail at the current star position
-        const randomOffset = () => Math.random() * 10 - 5;
-        const newTrail: StarTrail = {
-          id: Date.now(),
-          x: 50 + randomOffset(), // center + small random offset
-          y: starPosition + randomOffset(),
-          size: Math.max(8, Math.min(20, multiplier * 2)) // Size based on multiplier, between 8-20px
+      // Create more trails as multiplier increases
+      const trailsCount = multiplier >= 5 ? 4 : 
+                         multiplier >= 2 ? 2 : 1;
+      
+      // Create multiple trails based on multiplier
+      for (let i = 0; i < trailsCount; i++) {
+        // Create a new trail at the current star position with random offsets
+        const createTrail = () => {
+          // More random spread for higher multipliers
+          const spreadFactor = Math.min(30, multiplier * 3);
+          const randomOffset = () => (Math.random() * spreadFactor) - (spreadFactor / 2);
+          
+          const newTrail: StarTrail = {
+            id: Date.now() + i,
+            x: 50 + randomOffset(), // center + random offset
+            y: starPosition + randomOffset(),
+            size: Math.max(8, Math.min(24, multiplier * Math.random() * 3)) // Dynamic size
+          };
+          
+          setTrails(prev => [...prev, newTrail]);
+          
+          // Remove trails after animation completes (staggered for visual interest)
+          setTimeout(() => {
+            setTrails(prev => prev.filter(trail => trail.id !== newTrail.id));
+          }, 600 + Math.random() * 400); // Random duration between 600-1000ms
         };
         
-        setTrails(prev => [...prev, newTrail]);
-        
-        // Remove trails after animation completes
-        setTimeout(() => {
-          setTrails(prev => prev.filter(trail => trail.id !== newTrail.id));
-        }, 800); // Match with CSS animation duration
+        // Stagger trail creation for visual interest
+        setTimeout(createTrail, i * 50);
       }
       
       // Update reference
@@ -110,11 +122,14 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
       {trails.map(trail => (
         <div 
           key={trail.id}
-          className="star-trail"
+          className="star-trail animate-fade-out absolute"
           style={{
             left: `${trail.x}%`,
             bottom: `${trail.y}%`,
-            filter: "drop-shadow(0 0 5px rgba(255, 215, 0, 0.5))"
+            filter: "drop-shadow(0 0 5px rgba(255, 215, 0, 0.5))",
+            opacity: 0.8,
+            transform: `rotate(${Math.random() * 360}deg)`, // Random rotation
+            transition: 'all 0.5s ease-out'
           }}
         >
           <StarIcon size={trail.size} />
@@ -124,16 +139,27 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
       {/* Flying Star Animation with Multiplier */}
       {isLive && !hasCrashed && (
         <div 
-          className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-100"
+          className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-300 ease-out animate-pulse-slow"
           style={{ 
             bottom: `${starPosition}%`,
-            filter: "drop-shadow(0 0 10px rgba(255, 215, 0, 0.7))",
-            zIndex: 10 // Ensure main star is above trails
+            filter: `drop-shadow(0 0 ${Math.min(15, 5 + multiplier/2)}px rgba(255, 215, 0, 0.8))`,
+            zIndex: 10, // Ensure main star is above trails
+            transform: `translate(-50%) scale(${Math.min(1.3, 1 + multiplier/25)})` // Grow slightly with multiplier
           }}
         >
-          <StarIcon size={32} />
-          <div className="absolute top-0 left-full ml-2 font-pixel text-white bg-ui-dark bg-opacity-70 px-2 py-1 rounded text-lg whitespace-nowrap">
-            {multiplier.toFixed(2)}x
+          <div className="animate-spin-slow">
+            <StarIcon size={32} />
+          </div>
+          <div 
+            className="absolute top-0 left-full ml-2 font-pixel text-white bg-ui-dark bg-opacity-70 px-2 py-1 rounded text-lg whitespace-nowrap"
+            style={{
+              borderLeft: multiplier >= 2 ? '2px solid #FFD700' : 'none',
+              boxShadow: multiplier >= 3 ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none'
+            }}
+          >
+            <span className={multiplier >= 2 ? 'text-accent' : 'text-white'}>
+              {multiplier.toFixed(2)}x
+            </span>
           </div>
         </div>
       )}

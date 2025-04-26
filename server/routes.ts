@@ -438,17 +438,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 // Helper function to generate a crash point (1.0 to 100.0)
 function generateCrashPoint(): number {
-  // House edge of approximately 5%
-  // This creates a distribution where most crashes happen at lower values
-  const houseEdge = 0.95;
-  const randomValue = Math.random();
+  // 70% chance of low values (1.01 to 2.00)
+  // 20% chance of medium values (2.01 to 5.00)
+  // 10% chance of high values (5.01 to 50.00)
+  const randValue = Math.random();
   
-  // Formula that gives an exponential distribution
-  // Minimum 1.0, with decreasing probability for higher values
-  const crashPoint = Math.max(1.0, Math.floor((100 * houseEdge / randomValue) * 100) / 100);
-  
-  // Cap at 100.0 for a better user experience
-  return Math.min(crashPoint, 100.0);
+  if (randValue < 0.70) {
+    // Low values: more concentrated around 1.01-1.50
+    const baseValue = 1.01;
+    const lowRandom = Math.random(); 
+    // Use square to concentrate more values near the beginning
+    const skewedLowRandom = lowRandom * lowRandom;
+    return baseValue + skewedLowRandom * 0.99; // 1.01 to 2.00
+  } else if (randValue < 0.90) {
+    // Medium values
+    return 2.01 + Math.random() * 2.99; // 2.01 to 5.00
+  } else {
+    // High values - exponential distribution for rare high crashes
+    const baseHigh = 5.01;
+    const exponential = Math.log(1 - Math.random()) / -0.2;
+    const highValue = baseHigh + exponential * 3;
+    
+    // Round to 2 decimal places
+    const rounded = Math.floor(highValue * 100) / 100;
+    
+    // Cap at 50.0 for a better user experience
+    return Math.min(rounded, 50.0);
+  }
 }
 
 // Helper function to start crash game timer
