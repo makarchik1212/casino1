@@ -114,16 +114,13 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
     };
   }, [multiplier, isLive, hasCrashed]);
   
-  // Управление обратным отсчетом при краше и между играми
+  // Управление обратным отсчетом только между играми, а не после краша
   useEffect(() => {
-    // В обоих случаях - когда игра не активна или когда произошел краш - 
-    // показываем счетчик обратного отсчета
-    if (!isLive || hasCrashed) {
-      // Если не игра, сбрасываем высоту графика
-      if (!isLive) {
-        setHeight(0);
-        setStarPosition(100); // Reset star to bottom
-      }
+    // Только когда идет между игр (!isLive && !hasCrashed)
+    if (!isLive && !hasCrashed) {
+      // Сбрасываем высоту графика
+      setHeight(0);
+      setStarPosition(100); // Reset star to bottom
       
       // Запустить обратный отсчет времени до следующей игры
       setCountdown(10); // Сбросить счетчик при начале нового отсчета
@@ -224,18 +221,8 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
       
       {hasCrashed && (
         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-          <div className="bg-primary px-4 py-2 rounded font-pixel text-white animate-bounce mb-4">
+          <div className="bg-primary px-4 py-2 rounded font-pixel text-white animate-bounce">
             CRASHED!
-          </div>
-          
-          {/* Таймер обратного отсчета, который сразу появляется после краша */}
-          <div className="bg-ui-dark px-6 py-3 rounded-lg font-pixel text-white text-center">
-            <div className="mb-1 text-accent animate-pulse-slow">NEXT ROUND IN</div>
-            {/* Таймер обратного отсчета с анимацией */}
-            <div className="mt-2 text-3xl font-pixel relative">
-              <span className="animate-timer">{countdown}</span>
-              <span className="text-sm ml-1 text-accent">s</span>
-            </div>
           </div>
         </div>
       )}
