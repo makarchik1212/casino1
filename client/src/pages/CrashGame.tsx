@@ -273,10 +273,11 @@ const CrashGame = () => {
       return;
     }
     
-    if (isLive) {
+    // Убираем проверку на isLive, теперь можно делать ставки в любой момент
+    if (currentBet) {
       toast({
-        title: "Game In Progress",
-        description: "Wait for the next round to place a bet.",
+        title: "Bet Already Placed",
+        description: "You already have an active bet for this round.",
         variant: "destructive"
       });
       return;
@@ -370,10 +371,8 @@ const CrashGame = () => {
               onSubmit={currentBet && isLive ? handleCashout : handlePlaceBet}
               isSubmitDisabled={
                 (currentBet && (!isLive || hasCrashed)) || 
-                (!currentBet && isLive) ||
-                !user ||
-                // Enable betting only when we're waiting for bets between games
-                (!waitingForBets && !currentBet)
+                !user
+                // Разрешаем делать ставки во время ожидания И во время самой игры
               }
               isLoading={isBetting || isCashingOut}
               variant={currentBet && isLive ? "secondary" : "primary"}

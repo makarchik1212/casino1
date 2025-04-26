@@ -181,7 +181,7 @@ const BetControls = ({
           variant={variant}
           className={`w-full py-3 font-pixel text-lg uppercase`}
           onClick={handleSubmit}
-          disabled={isSubmitDisabled || isLoading || waitingCountdown !== undefined}
+          disabled={isSubmitDisabled || isLoading}
         >
           {isLoading ? "LOADING..." : submitLabel}
         </PixelButton>
