@@ -317,10 +317,19 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
                 <div className="absolute inset-0 bg-accent/10 rounded-full animate-pulse-soft" 
                      style={{ transform: 'scale(1.3)' }}></div>
                      
-                {/* Цифра таймера */}
-                <div className="text-4xl font-pixel animate-timer relative z-10 px-4">
-                  <span className="text-accent font-bold">{countdown}</span>
-                  <span className="text-sm text-white ml-1">s</span>
+                {/* Цифра таймера в стиле Cobalt с явным заполнением и градиентами */}
+                <div className="text-4xl font-pixel relative z-10 px-4 flex flex-col items-center">
+                  <div className="cobalt-timer-container">
+                    <div className="cobalt-timer-bg"></div>
+                    <div 
+                      className="cobalt-timer-fill" 
+                      style={{
+                        width: `${(countdown / 10) * 100}%`
+                      }}
+                    ></div>
+                    <span className="cobalt-timer-text text-accent font-bold">{countdown}</span>
+                    <span className="text-sm text-white ml-1">s</span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -205,19 +205,22 @@ const CrashGame = () => {
         // Play cash sound
         playSound(cashSound);
         
-        // Update user balance
+        // Рассчитываем правильный выигрыш на основе ставки
+        const winAmount = Math.floor(currentBet.betAmount * currentMultiplier);
+        const profit = winAmount - currentBet.betAmount;
+        
+        // Update user balance - добавляем всю сумму выигрыша к балансу
         if (user) {
-          const profit = Math.floor(betAmount * currentMultiplier) - betAmount;
-          updateUserBalance(user.balance + betAmount + profit);
+          updateUserBalance(user.balance + winAmount);
         }
         
-        // Show success toast
+        // Show success toast с правильной информацией о выигрыше
         toast({
-          title: "Cashed Out!",
-          description: `You won ${Math.floor(betAmount * currentMultiplier) - betAmount} Telegram Stars at ${formatMultiplier(currentMultiplier)}!`
+          title: "Успешный выигрыш!",
+          description: `Вы выиграли ${profit} Telegram Stars при коэффициенте ${formatMultiplier(currentMultiplier)}!`
         });
         
-        // Refresh history
+        // Refresh history чтобы обновить историю игр
         queryClient.invalidateQueries({ queryKey: ['/api/history/' + user?.id] });
       }
     },
@@ -225,8 +228,8 @@ const CrashGame = () => {
       console.error('Error cashing out:', error);
       setIsCashingOut(false);
       toast({
-        title: "Cashout Failed",
-        description: "Failed to cash out. Please try again.",
+        title: "Ошибка вывода",
+        description: "Не удалось вывести деньги. Попробуйте еще раз.",
         variant: "destructive"
       });
     }
@@ -267,8 +270,19 @@ const CrashGame = () => {
   const handleCashout = () => {
     if (!currentBet || !isLive || hasCrashed) return;
     
+    // Подтверждаем текущий коэффициент для расчета выигрыша
+    const winAmount = Math.floor(currentBet.betAmount * currentMultiplier);
+    const profit = winAmount - currentBet.betAmount;
+    
     setIsCashingOut(true);
     cashoutMutation.mutate();
+    
+    // Показываем всплывающее уведомление с выигрышем
+    toast({
+      title: "Выигрыш!",
+      description: `Вы выиграли ${profit} Telegram Stars при коэффициенте ${currentMultiplier.toFixed(2)}x!`,
+      variant: "success"
+    });
   };
   
   return (
@@ -329,7 +343,7 @@ const CrashGame = () => {
               onSecondaryChange={setAutoCashoutAt}
               secondaryLabel="AUTO CASHOUT AT"
               secondarySuffix="X"
-              submitLabel={currentBet && isLive ? `CASHOUT ${Math.floor(betAmount * currentMultiplier)}` : "PLACE BET"}
+              submitLabel={currentBet && isLive ? `CASHOUT ${Math.floor(currentBet.betAmount * currentMultiplier)} (+${Math.floor(currentBet.betAmount * currentMultiplier - currentBet.betAmount)})` : "PLACE BET"}
               onSubmit={currentBet && isLive ? handleCashout : handlePlaceBet}
               isSubmitDisabled={
                 (currentBet && (!isLive || hasCrashed)) || 
