@@ -105,12 +105,15 @@ const BetControls = ({
   };
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="bg-ui-medium p-3 rounded">
-        <label className="font-pixel text-xs block mb-2">BET AMOUNT</label>
-        <div className="flex">
+    <div className="grid grid-cols-2 gap-4">
+      {/* Bet Amount Block */}
+      <div className="bg-gray-800 p-3 rounded">
+        <div className="text-center text-gray-400 uppercase text-xs mb-2">
+          BET AMOUNT
+        </div>
+        <div className="flex items-center justify-between">
           <button 
-            className="bg-ui-dark px-2 py-1 font-pixel"
+            className="bg-gray-700 hover:bg-gray-600 rounded-l px-3 py-1 text-xl font-bold"
             onClick={() => handleDecrease('bet', 10)}
             disabled={isLoading}
           >
@@ -121,11 +124,11 @@ const BetControls = ({
             value={betInput} 
             onChange={handleBetChange}
             onBlur={handleBetBlur}
-            className="bg-dark text-white text-center font-pixel w-full focus:outline-none"
+            className="bg-gray-700 text-white text-center font-pixel w-full mx-1 py-1 focus:outline-none"
             disabled={isLoading}
           />
           <button 
-            className="bg-ui-dark px-2 py-1 font-pixel"
+            className="bg-gray-700 hover:bg-gray-600 rounded-r px-3 py-1 text-xl font-bold"
             onClick={() => handleIncrease('bet', 10)}
             disabled={isLoading}
           >
@@ -134,34 +137,47 @@ const BetControls = ({
         </div>
       </div>
       
+      {/* Auto Cashout Block */}
       {onSecondaryChange && (
-        <div className="bg-ui-medium p-3 rounded">
-          <label className="font-pixel text-xs block mb-2">{secondaryLabel}</label>
-          <div className="flex">
+        <div className="bg-gray-800 p-3 rounded">
+          <div className="text-center text-gray-400 uppercase text-xs mb-2">
+            {secondaryLabel}
+          </div>
+          <div className="flex items-center justify-between">
             <button 
-              className="bg-ui-dark px-2 py-1 font-pixel"
+              className="bg-gray-700 hover:bg-gray-600 rounded-l px-3 py-1 text-xl font-bold"
               onClick={() => handleDecrease('secondary', secondarySuffix === "X" ? 0.25 : 1)}
               disabled={isLoading}
             >
               -
             </button>
-            <input 
-              type="text" 
-              value={secondaryInput} 
-              onChange={handleSecondaryChange}
-              onBlur={handleSecondaryBlur}
-              className="bg-dark text-white text-center font-pixel w-full focus:outline-none"
+            <div className="flex items-center bg-gray-700 w-full mx-1 py-1">
+              <input 
+                type="text" 
+                value={secondaryInput} 
+                onChange={handleSecondaryChange}
+                onBlur={handleSecondaryBlur}
+                className="bg-gray-700 text-white text-center font-pixel w-full focus:outline-none"
+                disabled={isLoading}
+              />
+              <span className="text-white font-pixel pr-2">{secondarySuffix}</span>
+            </div>
+            <button 
+              className="bg-gray-700 hover:bg-gray-600 rounded-r px-3 py-1 text-xl font-bold"
+              onClick={() => handleIncrease('secondary', secondarySuffix === "X" ? 0.25 : 1)}
               disabled={isLoading}
-            />
-            <span className="bg-ui-dark px-2 py-1 font-pixel">{secondarySuffix}</span>
+            >
+              +
+            </button>
           </div>
         </div>
       )}
       
-      <div className="bg-ui-medium p-3 rounded flex items-center justify-center">
+      {/* Submit Button - Full Width */}
+      <div className="col-span-2 mt-2">
         <PixelButton
           variant={variant}
-          className="w-full py-3 font-pixel text-lg"
+          className="w-full py-3 font-pixel text-lg uppercase"
           onClick={handleSubmit}
           disabled={isSubmitDisabled || isLoading}
         >

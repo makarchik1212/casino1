@@ -318,4 +318,31 @@
   .pulse-live {
     animation: pulse-live 0.8s infinite;
   }
+  
+  /* Новые стили для таймера как на скриншоте */
+  .timer-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  
+  .timer-value {
+    font-size: 4rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 10px rgba(100, 149, 237, 0.5);
+    font-family: 'Press Start 2P', monospace;
+  }
+  
+  .timer-label {
+    color: rgb(100, 149, 237);
+    margin-top: 0.5rem;
+    font-size: 1rem;
+  }
 }
