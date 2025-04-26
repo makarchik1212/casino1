@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSound } from "@/contexts/SoundContext";
 import { PixelButton } from "@/components/ui/pixel-button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import clickSound from "@/assets/sounds/click";
 
 interface BetControlsProps {
@@ -36,6 +39,7 @@ const BetControls = ({
   const [secondaryInput, setSecondaryInput] = useState(
     secondaryValue ? secondaryValue.toString() : ""
   );
+  const [isAutoCashoutEnabled, setIsAutoCashoutEnabled] = useState(true);
   const { playSound } = useSound();
   
   // Synchronize with parent component
@@ -139,17 +143,32 @@ const BetControls = ({
         </div>
       </div>
       
-      {/* Auto Cashout Block */}
+      {/* Auto Cashout Block с переключателем */}
       {onSecondaryChange && (
         <div className="bg-gray-800 p-3 rounded">
-          <div className="text-center text-gray-400 uppercase text-xs mb-2">
-            {secondaryLabel}
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-gray-400 uppercase text-xs">
+              {secondaryLabel}
+            </div>
+            <div className="flex items-center gap-2">
+              <Label 
+                htmlFor="enable-auto-cashout" 
+                className="text-xs font-medium text-gray-400 cursor-pointer"
+              >
+                {isAutoCashoutEnabled ? "Вкл" : "Выкл"}
+              </Label>
+              <Switch
+                id="enable-auto-cashout"
+                checked={isAutoCashoutEnabled}
+                onCheckedChange={setIsAutoCashoutEnabled}
+              />
+            </div>
           </div>
           <div className="flex items-center justify-between">
             <button 
               className="bg-gray-700 hover:bg-gray-600 rounded-l px-3 py-1 text-xl font-bold"
               onClick={() => handleDecrease('secondary', secondarySuffix === "X" ? 0.25 : 1)}
-              disabled={isLoading}
+              disabled={isLoading || !isAutoCashoutEnabled}
             >
               -
             </button>
@@ -159,15 +178,15 @@ const BetControls = ({
                 value={secondaryInput} 
                 onChange={handleSecondaryChange}
                 onBlur={handleSecondaryBlur}
-                className="bg-gray-700 text-white text-center font-pixel w-full focus:outline-none"
-                disabled={isLoading}
+                className={`bg-gray-700 text-white text-center font-pixel w-full focus:outline-none ${!isAutoCashoutEnabled ? 'opacity-50' : ''}`}
+                disabled={isLoading || !isAutoCashoutEnabled}
               />
               <span className="text-white font-pixel pr-2">{secondarySuffix}</span>
             </div>
             <button 
               className="bg-gray-700 hover:bg-gray-600 rounded-r px-3 py-1 text-xl font-bold"
               onClick={() => handleIncrease('secondary', secondarySuffix === "X" ? 0.25 : 1)}
-              disabled={isLoading}
+              disabled={isLoading || !isAutoCashoutEnabled}
             >
               +
             </button>
