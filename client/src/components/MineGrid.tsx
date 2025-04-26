@@ -4,7 +4,7 @@ import { useSound } from "@/contexts/SoundContext";
 import cashSound from "@/assets/sounds/cash";
 import clickSound from "@/assets/sounds/click";
 import crashSound from "@/assets/sounds/crash";
-import CoinIcon from "@/assets/icons/CoinIcon";
+import StarIcon from "@/assets/icons/StarIcon";
 import { X } from "lucide-react";
 
 interface MineGridProps {
@@ -17,6 +17,9 @@ interface MineGridProps {
   isLoading: boolean;
 }
 
+type CellState = 'hidden' | 'safe' | 'mine';
+type GridCell = { position: number, state: CellState };
+
 const MineGrid = ({
   mineCount,
   revealedPositions,
@@ -26,42 +29,45 @@ const MineGrid = ({
   isWin,
   isLoading
 }: MineGridProps) => {
-  const [grid, setGrid] = useState<Array<{ position: number, state: 'hidden' | 'safe' | 'mine' }>>(
-    Array.from({ length: 25 }, (_, i) => ({ position: i, state: 'hidden' }))
+  const [grid, setGrid] = useState<GridCell[]>(
+    Array.from({ length: 25 }, (_, i) => ({ position: i, state: 'hidden' as CellState }))
   );
   const { playSound } = useSound();
   
   // Update grid based on revealed positions and mine positions
   useEffect(() => {
+    // Create a new grid based on the current state
+    let updatedGrid = [...grid];
+    
     if (isGameOver && minePositions) {
-      // If game is over, show all mines
-      const newGrid = grid.map(cell => {
+      // Show all mines when game is over
+      updatedGrid = updatedGrid.map(cell => {
         if (minePositions.includes(cell.position)) {
-          return { ...cell, state: 'mine' };
+          return { ...cell, state: 'mine' as CellState };
         } else if (revealedPositions.includes(cell.position)) {
-          return { ...cell, state: 'safe' };
+          return { ...cell, state: 'safe' as CellState };
         }
-        return cell;
+        return { ...cell, state: 'hidden' as CellState };
       });
-      setGrid(newGrid);
       
-      // Play sound
+      // Play sound based on win/lose state
       if (isWin) {
         playSound(cashSound);
       } else {
         playSound(crashSound);
       }
     } else {
-      // Only show revealed positions
-      const newGrid = grid.map(cell => {
+      // Only show revealed positions during gameplay
+      updatedGrid = updatedGrid.map(cell => {
         if (revealedPositions.includes(cell.position)) {
-          return { ...cell, state: 'safe' };
+          return { ...cell, state: 'safe' as CellState };
         }
-        return { ...cell, state: 'hidden' };
+        return { ...cell, state: 'hidden' as CellState };
       });
-      setGrid(newGrid);
     }
-  }, [revealedPositions, minePositions, isGameOver, isWin]);
+    
+    setGrid(updatedGrid);
+  }, [revealedPositions, minePositions, isGameOver, isWin, playSound]);
   
   const handleCellClick = (position: number) => {
     if (isLoading || isGameOver || revealedPositions.includes(position)) return;
@@ -87,7 +93,7 @@ const MineGrid = ({
           )}
           onClick={() => handleCellClick(cell.position)}
         >
-          {cell.state === 'safe' && <CoinIcon size={20} />}
+          {cell.state === 'safe' && <StarIcon size={20} />}
           {cell.state === 'mine' && <X size={20} strokeWidth={3} />}
         </div>
       ))}

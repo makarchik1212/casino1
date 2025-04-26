@@ -1,13 +1,14 @@
-import { Card, CardProps } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { forwardRef } from "react";
+import { forwardRef, ReactNode } from "react";
 
-interface PixelCardProps extends CardProps {
+interface PixelCardProps extends React.HTMLAttributes<HTMLDivElement> {
   withBorder?: boolean;
+  children?: ReactNode;
 }
 
 const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(
-  ({ className, withBorder = true, ...props }, ref) => {
+  ({ className, withBorder = true, children, ...props }, ref) => {
     return (
       <Card
         className={cn(
@@ -17,11 +18,13 @@ const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(
         )}
         ref={ref}
         {...props}
-      />
+      >
+        {children}
+      </Card>
     );
   }
 );
 
 PixelCard.displayName = "PixelCard";
 
-export { PixelCard };
+export { PixelCard, type PixelCardProps };

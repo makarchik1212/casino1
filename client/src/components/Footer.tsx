@@ -28,7 +28,7 @@ const Footer = () => {
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="font-pixel text-accent text-sm mb-4">PIXEL CASINO</h3>
+            <h3 className="font-pixel text-accent text-sm mb-4">DROPNADO</h3>
             <p className="font-pixelText text-gray-400 text-sm mb-4">
               The most exciting retro-style crypto casino. Play, win, and climb the leaderboards!
             </p>
@@ -48,10 +48,10 @@ const Footer = () => {
           <div>
             <h3 className="font-pixel text-accent text-sm mb-4">QUICK LINKS</h3>
             <ul className="font-pixelText text-gray-400 space-y-2">
-              <li><Link href="/"><a className="hover:text-white">• Games</a></Link></li>
-              <li><Link href="/leaderboard"><a className="hover:text-white">• Leaderboard</a></Link></li>
-              <li><Link href="/history"><a className="hover:text-white">• Game History</a></Link></li>
-              <li><Link href="/profile"><a className="hover:text-white">• Profile</a></Link></li>
+              <li><Link href="/"><span className="hover:text-white cursor-pointer">• Games</span></Link></li>
+              <li><Link href="/leaderboard"><span className="hover:text-white cursor-pointer">• Leaderboard</span></Link></li>
+              <li><Link href="/history"><span className="hover:text-white cursor-pointer">• Game History</span></Link></li>
+              <li><Link href="/profile"><span className="hover:text-white cursor-pointer">• Profile</span></Link></li>
             </ul>
           </div>
           
@@ -75,7 +75,7 @@ const Footer = () => {
         
         <div className="mt-8 pt-6 border-t border-ui-medium text-center">
           <p className="font-pixelText text-gray-500 text-sm">
-            © 2023 Pixel Casino. All rights reserved. Must be 18+ to play. Play responsibly.
+            © 2025 Dropnado. All rights reserved. Must be 18+ to play. Play responsibly.
           </p>
         </div>
       </div>

@@ -25,7 +25,7 @@ const Layout = ({ children }: LayoutProps) => {
           });
         });
     }
-  }, []);
+  }, [user, login, toast]);
   
   return (
     <div className="flex flex-col min-h-screen">

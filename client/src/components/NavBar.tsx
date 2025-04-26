@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { Menu, X } from "lucide-react";
-import CoinIcon from "@/assets/icons/CoinIcon";
+import StarIcon from "@/assets/icons/StarIcon";
 import { cn, formatNumber } from "@/lib/utils";
 
 const NavBar = () => {
@@ -26,9 +26,9 @@ const NavBar = () => {
       <nav className="bg-dark border-b-4 border-ui-dark px-4 py-3">
         <div className="container mx-auto flex flex-wrap items-center justify-between">
           <div className="flex items-center space-x-2">
-            <CoinIcon className="animate-spin-slow" />
+            <StarIcon />
             <Link href="/">
-              <a className="font-pixel text-accent text-lg">PIXEL CASINO</a>
+              <span className="font-pixel text-accent text-lg cursor-pointer">DROPNADO</span>
             </Link>
           </div>
           
@@ -38,12 +38,12 @@ const NavBar = () => {
                 key={link.path} 
                 href={link.path}
               >
-                <a className={cn(
-                  "text-white hover:text-accent font-pixel text-xs",
+                <span className={cn(
+                  "text-white hover:text-accent font-pixel text-xs cursor-pointer",
                   location === link.path && "text-accent"
                 )}>
                   {link.name}
-                </a>
+                </span>
               </Link>
             ))}
           </div>
@@ -54,7 +54,7 @@ const NavBar = () => {
                 <span className="text-accent font-pixel text-sm mr-2">
                   {formatNumber(user.balance)}
                 </span>
-                <CoinIcon />
+                <StarIcon />
               </div>
             )}
             <button 
@@ -80,15 +80,15 @@ const NavBar = () => {
                 key={link.path} 
                 href={link.path}
               >
-                <a 
+                <span 
                   className={cn(
-                    "text-white hover:text-accent font-pixel text-xs py-2",
+                    "text-white hover:text-accent font-pixel text-xs py-2 cursor-pointer",
                     location === link.path && "text-accent"
                   )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.name}
-                </a>
+                </span>
               </Link>
             ))}
             {user && (

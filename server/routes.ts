@@ -1,7 +1,8 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { WebSocketServer, WebSocket } from "ws";
+// WebSockets disabled for now due to deployment issues
+// import { WebSocketServer, WebSocket } from "ws";
 import { z } from "zod";
 import { 
   insertUserSchema, 
@@ -12,33 +13,46 @@ import {
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   
-  // Setup WebSocket server for real-time game updates
-  const wss = new WebSocketServer({ server: httpServer });
-  
-  // WebSocket clients
-  const clients = new Map<string, WebSocket>();
-  
-  wss.on("connection", (ws) => {
-    const id = Math.random().toString(36).substring(2, 10);
-    clients.set(id, ws);
-    
-    ws.on("message", (message) => {
-      // Handle WebSocket messages if needed
-    });
-    
-    ws.on("close", () => {
-      clients.delete(id);
-    });
-  });
-  
-  // Helper function to broadcast to all clients
-  const broadcast = (data: any) => {
-    clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(data));
-      }
-    });
+  // Game state storage for polling (replacing WebSockets)
+  const gameState = {
+    currentCrashGame: null as any,
+    currentMultiplier: 1.0,
+    lastUpdate: Date.now(),
+    gameHistory: [] as any[]
   };
+  
+  // Helper function to update game state (replacing broadcast)
+  const updateGameState = (data: any) => {
+    try {
+      // Update the appropriate state based on the type
+      if (data.type === 'crash_update') {
+        gameState.currentMultiplier = data.currentMultiplier;
+        gameState.lastUpdate = Date.now();
+      } else if (data.type === 'crash_ended') {
+        // Keep track of game history (most recent 10 games)
+        if (gameState.gameHistory.length >= 10) {
+          gameState.gameHistory.shift();
+        }
+        gameState.gameHistory.push({
+          id: data.gameId,
+          crashPoint: data.crashPoint,
+          timestamp: Date.now()
+        });
+      } else if (data.type === 'crash_new_game') {
+        gameState.currentCrashGame = { id: data.gameId };
+        gameState.currentMultiplier = 1.0;
+      }
+      
+      console.log(`Game state updated: ${data.type}`);
+    } catch (err) {
+      console.error("Error updating game state:", err);
+    }
+  };
+  
+  // Polling endpoint for game updates
+  app.get("/api/game-state", (req, res) => {
+    res.json(gameState);
+  });
   
   // User Authentication Routes
   app.post("/api/register", async (req, res) => {
@@ -139,7 +153,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const newGame = await storage.createCrashGame({ crashPoint });
         
         // Start the crash game timer
-        startCrashGameTimer(newGame.id, crashPoint, broadcast);
+        startCrashGameTimer(newGame.id, crashPoint, updateGameState);
+        
+        // Update game state
+        gameState.currentCrashGame = newGame;
+        gameState.currentMultiplier = 1.0;
         
         return res.json(newGame);
       }
@@ -219,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if game ended
       if (game.hasEnded) {
         // Check if multiplier is valid
-        if (multiplier > game.result) {
+        if (game.result !== null && multiplier > game.result) {
           return res.status(400).json({ 
             message: "Invalid multiplier - game already crashed" 
           });
@@ -249,6 +267,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Mines Game Routes
+  app.get("/api/mines/active/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      // Verify user exists
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check for active game
+      const activeGame = await storage.getActiveMinesGame(userId);
+      if (!activeGame) {
+        return res.status(404).json({ message: "No active game found" });
+      }
+      
+      // Return game without mine positions unless game is over
+      if (activeGame.isCompleted) {
+        res.json(activeGame);
+      } else {
+        const { minePositions, ...gameWithoutMines } = activeGame;
+        res.json(gameWithoutMines);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get active game" });
+    }
+  });
+  
   app.post("/api/mines/start", async (req, res) => {
     try {
       const gameData = insertMinesGameSchema.parse(req.body);
@@ -380,7 +426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Return game with mine positions revealed
       res.json({
         ...updatedGame,
-        message: `Cashed out successfully! You won ${updatedGame.profit} coins.`
+        message: `Cashed out successfully! You won ${updatedGame.profit} stars.`
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to cashout game" });
@@ -409,69 +455,87 @@ function generateCrashPoint(): number {
 function startCrashGameTimer(
   gameId: number, 
   crashPoint: number,
-  broadcast: (data: any) => void
+  updateGameState: (data: any) => void
 ) {
-  // Calculate how long the game should last in milliseconds
-  // The duration increases with higher crash points to build tension
-  // Base duration is 3 seconds (representing a 1.0x multiplier)
-  const baseDuration = 3000; // 3 seconds
-  const duration = baseDuration * Math.log2(crashPoint + 1);
-  
-  // Start time
-  const startTime = Date.now();
-  const endTime = startTime + duration;
-  
-  // Send updates 10 times per second
-  const interval = setInterval(async () => {
-    const currentTime = Date.now();
+  try {
+    console.log(`Starting crash game timer for game ${gameId} with crash point ${crashPoint}`);
     
-    // Calculate current multiplier based on elapsed time
-    const elapsedRatio = (currentTime - startTime) / duration;
-    let currentMultiplier = 1 + (crashPoint - 1) * elapsedRatio;
+    // Calculate how long the game should last in milliseconds
+    // The duration increases with higher crash points to build tension
+    // Base duration is 3 seconds (representing a 1.0x multiplier)
+    const baseDuration = 3000; // 3 seconds
+    const duration = baseDuration * Math.log2(crashPoint + 1);
     
-    // Round to 2 decimal places
-    currentMultiplier = Math.floor(currentMultiplier * 100) / 100;
+    // Start time
+    const startTime = Date.now();
+    const endTime = startTime + duration;
     
-    // Broadcast current state
-    broadcast({
-      type: "crash_update",
-      gameId,
-      currentMultiplier,
-      hasEnded: false
-    });
-    
-    // Check if it's time to crash
-    if (currentTime >= endTime) {
-      clearInterval(interval);
-      
-      // End the game
-      const storage = (await import("./storage")).storage;
-      const endedGame = await storage.endCrashGame(gameId, crashPoint);
-      
-      // Broadcast crash event
-      broadcast({
-        type: "crash_ended",
-        gameId,
-        crashPoint,
-        hasEnded: true
-      });
-      
-      // Start a new game after a brief pause
-      setTimeout(async () => {
-        const newCrashPoint = generateCrashPoint();
-        const newGame = await storage.createCrashGame({ crashPoint: newCrashPoint });
+    // Send updates 5 times per second (reduced from 10 to lower server load)
+    const interval = setInterval(async () => {
+      try {
+        const currentTime = Date.now();
         
-        // Broadcast new game
-        broadcast({
-          type: "crash_new_game",
-          gameId: newGame.id
+        // Calculate current multiplier based on elapsed time
+        const elapsedRatio = (currentTime - startTime) / duration;
+        let currentMultiplier = 1 + (crashPoint - 1) * elapsedRatio;
+        
+        // Round to 2 decimal places
+        currentMultiplier = Math.floor(currentMultiplier * 100) / 100;
+        
+        // Update game state
+        updateGameState({
+          type: "crash_update",
+          gameId,
+          currentMultiplier,
+          hasEnded: false
         });
         
-        // Start timer for new game
-        startCrashGameTimer(newGame.id, newCrashPoint, broadcast);
-      }, 5000); // 5 second pause between games
-    }
-  }, 100); // 10 updates per second
+        // Check if it's time to crash
+        if (currentTime >= endTime) {
+          clearInterval(interval);
+          
+          try {
+            // End the game
+            const storage = (await import("./storage")).storage;
+            await storage.endCrashGame(gameId, crashPoint);
+            
+            // Update game state with crash event
+            updateGameState({
+              type: "crash_ended",
+              gameId,
+              crashPoint,
+              hasEnded: true
+            });
+            
+            // Start a new game after a brief pause
+            setTimeout(async () => {
+              try {
+                const newCrashPoint = generateCrashPoint();
+                const newGame = await storage.createCrashGame({ crashPoint: newCrashPoint });
+                
+                // Update game state with new game
+                updateGameState({
+                  type: "crash_new_game",
+                  gameId: newGame.id
+                });
+                
+                // Start timer for new game
+                startCrashGameTimer(newGame.id, newCrashPoint, updateGameState);
+              } catch (err) {
+                console.error("Error starting new crash game:", err);
+              }
+            }, 5000); // 5 second pause between games
+          } catch (err) {
+            console.error("Error ending crash game:", err);
+          }
+        }
+      } catch (err) {
+        console.error("Error in crash game interval:", err);
+      }
+    }, 200); // 5 updates per second
+  } catch (err) {
+    console.error("Error setting up crash game timer:", err);
+  }
 }
 
 // Helper function to generate random mine positions

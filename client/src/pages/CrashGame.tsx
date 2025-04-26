@@ -17,7 +17,6 @@ const CrashGame = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { playSound } = useSound();
-  const wsRef = useRef<WebSocket | null>(null);
   
   // Game state
   const [currentGame, setCurrentGame] = useState<any>(null);
@@ -33,88 +32,117 @@ const CrashGame = () => {
   const [isBetting, setIsBetting] = useState(false);
   const [isCashingOut, setIsCashingOut] = useState(false);
   
-  // WebSocket connection for real-time updates
+  // Polling for real-time updates (replacing WebSocket)
   useEffect(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}`;
+    let pollInterval: ReturnType<typeof setInterval>;
     
-    wsRef.current = new WebSocket(wsUrl);
-    
-    wsRef.current.onopen = () => {
-      console.log('WebSocket connected');
-    };
-    
-    wsRef.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      
-      if (data.type === 'crash_update') {
-        setCurrentMultiplier(data.currentMultiplier);
-        setIsLive(true);
-        setHasCrashed(false);
+    const fetchGameState = async () => {
+      try {
+        const response = await fetch('/api/game-state');
+        if (!response.ok) throw new Error('Failed to fetch game state');
         
-        // Auto cashout if threshold is reached and we have a bet
-        if (currentBet && autoCashoutAt && data.currentMultiplier >= autoCashoutAt) {
-          handleCashout();
+        const gameState = await response.json();
+        
+        // Update multiplier and game state
+        setCurrentMultiplier(gameState.currentMultiplier);
+        
+        // Check if game is live
+        if (gameState.currentCrashGame && !gameState.currentCrashGame.hasEnded) {
+          setIsLive(true);
+          setHasCrashed(false);
+          
+          // Auto cashout if threshold is reached and we have a bet
+          if (currentBet && autoCashoutAt && gameState.currentMultiplier >= autoCashoutAt) {
+            handleCashout();
+          }
+        } else if (gameState.gameHistory && gameState.gameHistory.length > 0) {
+          // Handle crash event (game ended)
+          const latestCrash = gameState.gameHistory[gameState.gameHistory.length - 1];
+          
+          // Only process crash if we haven't seen it yet
+          if (!recentResults.includes(latestCrash.crashPoint)) {
+            setCurrentMultiplier(latestCrash.crashPoint);
+            setHasCrashed(true);
+            setIsLive(false);
+            
+            // Add result to recent results
+            setRecentResults(prev => {
+              const updated = [latestCrash.crashPoint, ...prev];
+              return updated.slice(0, 8); // Keep only 8 most recent
+            });
+            
+            // If we had a bet and didn't cash out, mark it as lost
+            if (currentBet && !currentBet.cashedOut) {
+              setCurrentBet(null);
+              try {
+                toast({
+                  title: "Crashed!",
+                  description: `The game crashed at ${formatMultiplier(latestCrash.crashPoint)}. You lost your bet.`,
+                  variant: "destructive"
+                });
+              } catch (error) {
+                console.error("Error showing toast:", error);
+              }
+            }
+          }
         }
-      }
-      else if (data.type === 'crash_ended') {
-        setCurrentMultiplier(data.crashPoint);
-        setHasCrashed(true);
-        setIsLive(false);
         
-        // Add result to recent results
-        setRecentResults(prev => {
-          const updated = [data.crashPoint, ...prev];
-          return updated.slice(0, 8); // Keep only 8 most recent
-        });
-        
-        // If we had a bet and didn't cash out, mark it as lost
-        if (currentBet && !currentBet.cashedOut) {
+        // Handle new game starting
+        if (gameState.currentCrashGame && gameState.currentMultiplier === 1.0 && !isLive && !hasCrashed) {
+          setCurrentGame(gameState.currentCrashGame);
+          setCurrentMultiplier(1.0);
+          setIsLive(false);
+          setHasCrashed(false);
+          
+          // Reset bet state
           setCurrentBet(null);
-          toast({
-            title: "Crashed!",
-            description: `The game crashed at ${formatMultiplier(data.crashPoint)}. You lost your bet.`,
-            variant: "destructive"
-          });
+          setIsBetting(false);
+          setIsCashingOut(false);
         }
-      }
-      else if (data.type === 'crash_new_game') {
-        // Prepare for new game
-        setCurrentGame({ id: data.gameId });
-        setCurrentMultiplier(1.0);
-        setIsLive(false);
-        setHasCrashed(false);
-        
-        // Reset bet state
-        setCurrentBet(null);
-        setIsBetting(false);
-        setIsCashingOut(false);
+      } catch (error) {
+        console.error('Error polling game state:', error);
       }
     };
     
-    wsRef.current.onclose = () => {
-      console.log('WebSocket disconnected');
-    };
+    // Initial fetch
+    fetchGameState();
+    
+    // Set up polling interval - check for updates every 200ms
+    pollInterval = setInterval(fetchGameState, 200);
     
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
+      clearInterval(pollInterval);
+    };
+  }, [currentBet, autoCashoutAt, isLive, hasCrashed, recentResults, toast]);
+  
+  // Use for loading state only
+  const [isLoadingGame, setIsLoadingGame] = useState(true);
+  
+  // Handle initial data loading
+  useEffect(() => {
+    const fetchInitialGame = async () => {
+      try {
+        const res = await fetch('/api/crash/current');
+        if (!res.ok) return;
+        
+        const data = await res.json();
+        setCurrentGame(data);
+        
+        // If game is in progress, set state accordingly
+        if (data && !data.hasEnded) {
+          setIsLive(true);
+          setHasCrashed(false);
+        }
+        
+        // Set loading to false
+        setIsLoadingGame(false);
+      } catch (error) {
+        console.error('Error fetching initial game:', error);
       }
     };
-  }, [currentBet, autoCashoutAt]);
-  
-  // Get current game on mount
-  const { isLoading: isLoadingGame } = useQuery({
-    queryKey: ['/api/crash/current'],
-    onSuccess: (data) => {
-      setCurrentGame(data);
-      // If game is in progress, set state accordingly
-      if (!data.hasEnded) {
-        setIsLive(true);
-        setHasCrashed(false);
-      }
-    }
-  });
+    
+    fetchInitialGame();
+  }, []);
   
   // Place bet mutation
   const placeBetMutation = useMutation({

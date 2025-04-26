@@ -118,26 +118,7 @@
     transition: all 0.2s;
   }
   
-  /* Coin sprite animation */
-  .coin-sprite {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    background-color: theme('colors.accent');
-    border-radius: 50%;
-    position: relative;
-  }
-
-  .coin-sprite::after {
-    content: "$";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 14px;
-    color: theme('colors.dark');
-  }
-  
+  /* Animation effects */
   @keyframes spin-slow {
     0% { transform: rotateY(0deg); }
     100% { transform: rotateY(360deg); }
@@ -147,12 +128,14 @@
     animation: spin-slow 3s linear infinite;
   }
   
-  @keyframes coin-flip {
-    0% { transform: rotateY(0deg); }
-    100% { transform: rotateY(180deg); }
+  /* Star trail animation */
+  @keyframes star-trail {
+    0% { opacity: 1; transform: scale(1) translate(0, 0); }
+    100% { opacity: 0; transform: scale(0.5) translate(20px, 20px); }
   }
   
-  .animate-coin-flip {
-    animation: coin-flip 1s ease-in-out;
+  .star-trail {
+    position: absolute;
+    animation: star-trail 0.8s ease-out forwards;
   }
 }

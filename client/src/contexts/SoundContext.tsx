@@ -14,7 +14,7 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   
   // Load mute preference from localStorage
   useEffect(() => {
-    const storedMute = localStorage.getItem("pixelCasinoMuted");
+    const storedMute = localStorage.getItem("dropnadoMuted");
     if (storedMute !== null) {
       setIsMuted(storedMute === "true");
     }
@@ -23,7 +23,7 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const toggleMute = () => {
     const newMuted = !isMuted;
     setIsMuted(newMuted);
-    localStorage.setItem("pixelCasinoMuted", newMuted.toString());
+    localStorage.setItem("dropnadoMuted", newMuted.toString());
   };
   
   const playSound = (soundSrc: string) => {

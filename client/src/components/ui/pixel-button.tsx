@@ -1,20 +1,22 @@
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ButtonProps } from "@radix-ui/react-button";
+import { Slot } from "@radix-ui/react-slot";
 import { forwardRef } from "react";
 
-interface PixelButtonProps extends ButtonProps {
+interface PixelButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "accent" | "outline" | "ghost";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
+  children?: React.ReactNode;
+  asChild?: boolean;
 }
 
 const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(
-  ({ variant = "primary", size = "default", className, ...props }, ref) => {
+  ({ variant = "primary", size = "default", className, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
     return (
-      <Button
+      <Comp
         className={cn(
-          "pixel-btn rounded font-pixel",
+          "pixel-btn rounded font-pixel inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
           {
             "bg-primary hover:bg-red-600 text-white": variant === "primary",
             "bg-secondary hover:bg-green-600 text-white": variant === "secondary",

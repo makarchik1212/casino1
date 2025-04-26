@@ -13,7 +13,7 @@ const Home = () => {
   useEffect(() => {
     if (user) {
       toast({
-        title: "Welcome to Pixel Casino!",
+        title: "Welcome to Dropnado!",
         description: "Choose a game to start playing.",
       });
     }

@@ -11,6 +11,9 @@ import Leaderboard from "@/pages/Leaderboard";
 import History from "@/pages/History";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
+// Import the context providers directly in App
+import { AuthProvider } from "./contexts/AuthContext";
+import { SoundProvider } from "./contexts/SoundContext";
 
 function Router() {
   return (
@@ -29,13 +32,19 @@ function Router() {
 }
 
 function App() {
+  // Including AuthProvider and SoundProvider here as well as in main.tsx
+  // This ensures the context is available everywhere
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <SoundProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </AuthProvider>
+    </SoundProvider>
   );
 }
 
