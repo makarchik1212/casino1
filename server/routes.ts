@@ -614,12 +614,16 @@ function startCrashGameTimer(
             const storage = (await import("./storage")).storage;
             await storage.endCrashGame(gameId, crashPoint);
             
+            // Мгновенно сбрасываем множитель до 0
+            gameState.currentMultiplier = 0.0;
+            
             // Update game state with crash event
             updateGameState({
               type: "crash_ended",
               gameId,
               crashPoint,
-              hasEnded: true
+              hasEnded: true,
+              currentMultiplier: 0.0 // Явно указываем что коэффициент - ноль
             });
             
             // Создаем ID следующей игры заранее
