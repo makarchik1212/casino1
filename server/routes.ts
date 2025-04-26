@@ -438,32 +438,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 // Helper function to generate a crash point (1.0 to 100.0)
 function generateCrashPoint(): number {
-  // 70% chance of low values (1.01 to 2.00)
-  // 20% chance of medium values (2.01 to 5.00)
-  // 10% chance of high values (5.01 to 50.00)
-  const randValue = Math.random();
+  // Completely random approach with wider range distribution
+  const randMethod = Math.random();
   
-  if (randValue < 0.70) {
-    // Low values: more concentrated around 1.01-1.50
+  // Truly random method selector
+  if (randMethod < 0.3) {
+    // Method 1: Uniform distribution but properly weighted for randomness
     const baseValue = 1.01;
-    const lowRandom = Math.random(); 
-    // Use square to concentrate more values near the beginning
-    const skewedLowRandom = lowRandom * lowRandom;
-    return baseValue + skewedLowRandom * 0.99; // 1.01 to 2.00
-  } else if (randValue < 0.90) {
-    // Medium values
-    return 2.01 + Math.random() * 2.99; // 2.01 to 5.00
+    const randomRange = Math.random() * 10; // 0-10 range
+    let result;
+    
+    // Create non-linear distribution
+    if (randomRange < 6) { // 60% chance of lower values
+      result = baseValue + randomRange / 3; // 1.01-3.00
+    } else if (randomRange < 9) { // 30% chance of medium values
+      result = 3.01 + (randomRange - 6) * 2; // 3.01-9.00
+    } else { // 10% chance of high values
+      result = 9.01 + (randomRange - 9) * 20; // 9.01-29.00
+    }
+    
+    return Math.floor(result * 100) / 100;
+  } else if (randMethod < 0.7) {
+    // Method 2: Exponential distribution
+    const baseValue = 1.01;
+    const exponent = Math.log(1 - Math.random()) / -0.3;
+    const result = baseValue + exponent * 4;
+    return Math.min(Math.floor(result * 100) / 100, 40);
   } else {
-    // High values - exponential distribution for rare high crashes
-    const baseHigh = 5.01;
-    const exponential = Math.log(1 - Math.random()) / -0.2;
-    const highValue = baseHigh + exponential * 3;
+    // Method 3: Mixture model for extreme randomness
+    const baseValue = 1.01;
+    const roll = Math.random();
     
-    // Round to 2 decimal places
-    const rounded = Math.floor(highValue * 100) / 100;
-    
-    // Cap at 50.0 for a better user experience
-    return Math.min(rounded, 50.0);
+    if (roll < 0.7) { // 70% chance (49% of total)
+      return baseValue + (Math.random() * Math.random()) * 1.5; // 1.01-2.51
+    } else if (roll < 0.9) { // 20% chance (14% of total)
+      return 2.51 + Math.random() * 7.5; // 2.51-10.00
+    } else { // 10% chance (7% of total)
+      // Rare high values, can reach very high spikes
+      const spikeFactor = Math.random() < 0.3 ? 10 : 3; // 30% chance of extreme spike
+      return 10.01 + Math.random() * 30 * spikeFactor; // 10.01-40.00 or 10.01-300.00
+    }
   }
 }
 
@@ -523,7 +537,7 @@ function startCrashGameTimer(
               hasEnded: true
             });
             
-            // Start a new game after a brief pause
+            // Start a new game after a longer pause (10 seconds) to give players time to place bets
             setTimeout(async () => {
               try {
                 const newCrashPoint = generateCrashPoint();
@@ -540,7 +554,7 @@ function startCrashGameTimer(
               } catch (err) {
                 console.error("Error starting new crash game:", err);
               }
-            }, 5000); // 5 second pause between games
+            }, 10000); // 10 second pause between games to allow bet placements
           } catch (err) {
             console.error("Error ending crash game:", err);
           }

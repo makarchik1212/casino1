@@ -72,7 +72,8 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
       const targetHeight = getCrashGraphHeight(multiplier);
       const animate = () => {
         setHeight(prevHeight => {
-          const newHeight = Math.min(targetHeight, prevHeight + 0.5);
+          // Faster height animation for more dramatic effect
+          const newHeight = Math.min(targetHeight, prevHeight + 0.8);
           if (newHeight < targetHeight) {
             animationFrameRef.current = requestAnimationFrame(animate);
           }
@@ -81,8 +82,11 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
         
         // Update star position to move up with the increasing multiplier
         setStarPosition(prev => {
+          // Enhanced upward movement - more dramatic rise
           // Star moves from bottom (100%) to top (0%) as multiplier increases
-          const newPosition = Math.max(0, 100 - (multiplier - 1) * 10);
+          // Using a quadratic formula to accelerate upward movement
+          const moveSpeed = multiplier > 3 ? 15 : 10; // Faster at higher multipliers
+          const newPosition = Math.max(0, 100 - Math.pow(multiplier, 1.2) * moveSpeed / multiplier);
           return newPosition;
         });
       };
@@ -180,9 +184,15 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed }: CrashGraphProps) => {
       )}
       
       {!isLive && !hasCrashed && (
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-          <div className="bg-ui-dark px-4 py-2 rounded font-pixel text-white">
-            NEXT ROUND STARTING...
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
+          <div className="bg-ui-dark px-6 py-3 rounded-lg font-pixel text-white text-center mb-2">
+            <div className="mb-1 text-accent animate-pulse-slow">PLACE YOUR BETS NOW!</div>
+            <div className="text-sm">NEXT ROUND STARTING SOON</div>
+          </div>
+          <div className="flex items-center gap-2 bg-ui-dark bg-opacity-80 px-4 py-2 rounded-lg">
+            <div className="w-3 h-3 bg-secondary rounded-full animate-pulse"></div>
+            <div className="w-3 h-3 bg-secondary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-3 h-3 bg-secondary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
           </div>
         </div>
       )}
