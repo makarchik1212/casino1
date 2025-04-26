@@ -14,7 +14,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   
   // Game state storage for polling (replacing WebSockets)
-  const gameState = {
+  let gameState = {
     currentCrashGame: null as any,
     currentMultiplier: 1.0,
     lastUpdate: Date.now(),
@@ -54,6 +54,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (data.type === 'crash_waiting') {
         gameState.waitingCountdown = data.waitingCountdown;
         gameState.hasCrashed = data.hasCrashed;
+        gameState.currentMultiplier = 0.0; // Устанавливаем множитель в 0 во время ожидания
         // Сохраняем ID следующей игры если он предоставлен
         if (data.nextGameId) {
           gameState.nextGameId = data.nextGameId;
@@ -611,11 +612,8 @@ function startCrashGameTimer(
           
           try {
             // End the game
-            const storage = (await import("./storage")).storage;
-            await storage.endCrashGame(gameId, crashPoint);
-            
-            // Мгновенно сбрасываем множитель до 0
-            gameState.currentMultiplier = 0.0;
+            const storageModule = (await import("./storage"));
+            await storageModule.storage.endCrashGame(gameId, crashPoint);
             
             // Update game state with crash event
             updateGameState({
