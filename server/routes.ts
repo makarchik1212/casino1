@@ -541,7 +541,7 @@ function startCrashGameTimer(
               hasEnded: true
             });
             
-            // Сразу отправляем событие с обратным отсчетом, чтобы показать таймер
+            // Немедленно показываем таймер обратного отсчета
             updateGameState({
               type: "crash_waiting",
               gameId,

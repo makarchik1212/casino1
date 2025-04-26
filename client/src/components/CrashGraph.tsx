@@ -182,16 +182,16 @@ const CrashGraph = ({ multiplier, isLive, hasCrashed, waitingForBets, waitingCou
         </div>
       )}
       
-      {/* Таймер обратного отсчета - показывается даже после краша */}
-      {(hasCrashed || waitingCountdown !== undefined) && (
+      {/* Таймер обратного отсчета прямо посередине экрана - большой и заметный */}
+      {waitingCountdown !== undefined && waitingCountdown > 0 && (
         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center z-50">
-          <div className="relative z-30">
-            <div className="bg-ui-dark/90 px-8 py-6 rounded-lg border-2 border-yellow-500/50 shadow-lg text-center">
-              <div className="text-xl font-pixel text-white mb-2">СЛЕДУЮЩАЯ ИГРА</div>
-              <div className="text-4xl font-pixel font-bold text-yellow-400 pulse-live">
-                {waitingCountdown !== undefined ? waitingCountdown : 10}s
-              </div>
-            </div>
+          <div 
+            className="font-pixel text-7xl font-bold text-yellow-400 animate-pulse-slow"
+            style={{
+              textShadow: '0 0 20px rgba(255, 215, 0, 0.7)'
+            }}
+          >
+            {waitingCountdown}
           </div>
         </div>
       )}
