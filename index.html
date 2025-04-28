@@ -2,13 +2,14 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Главная - Crash Game</title>
+  <title>PixelStars - Главная</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
       font-family: 'Orbitron', sans-serif;
+      overflow: hidden;
       background: black;
       color: white;
       text-align: center;
@@ -23,29 +24,65 @@
       height: 100%;
       z-index: -1;
     }
-    h1 {
-      margin-top: 100px;
-      font-size: 48px;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0c0c1d;
+      padding: 10px 20px;
+      font-size: 24px;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
       color: #00ffcc;
-      text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+      text-shadow: 0 0 10px #00ffcc;
     }
     .balance {
-      margin-top: 20px;
-      font-size: 24px;
+      font-size: 22px;
+      color: #ffffff;
     }
-    .start-btn {
+    .content {
+      margin-top: 50px;
+    }
+    .game-selection {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
       margin-top: 30px;
-      padding: 15px 30px;
-      font-size: 24px;
-      background: linear-gradient(90deg, #4CAF50, #45A049);
-      color: white;
+    }
+    .card {
+      background: rgba(30, 30, 47, 0.9);
+      padding: 20px;
+      border-radius: 20px;
+      width: 200px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .card h2 {
+      margin-top: 15px;
+      font-size: 20px;
+    }
+    .play-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background: linear-gradient(90deg, #ff4c4c, #e63946);
       border: none;
       border-radius: 10px;
+      color: white;
       cursor: pointer;
       transition: background 0.3s;
     }
-    .start-btn:hover {
-      background: linear-gradient(90deg, #45A049, #4CAF50);
+    .play-btn:hover {
+      background: linear-gradient(90deg, #e63946, #ff4c4c);
     }
   </style>
 </head>
@@ -53,9 +90,26 @@
 
 <canvas id="stars"></canvas>
 
-<h1>Добро пожаловать в Crash Game</h1>
-<div class="balance">Ваш баланс: <span id="balance">0</span> монет</div>
-<button class="start-btn" onclick="startGame()">Играть</button>
+<div class="header">
+  <div class="logo">PixelStars ✦</div>
+  <div class="balance">Баланс: <span id="balance">0</span> монет</div>
+</div>
+
+<div class="content">
+  <h1>Выберите игру:</h1>
+  <div class="game-selection">
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/616/616489.png" alt="Crash Game">
+      <h2>Crash Game</h2>
+      <button class="play-btn" onclick="startCrash()">Играть</button>
+    </div>
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/2972/2972350.png" alt="Mines Game">
+      <h2>Mines Game</h2>
+      <button class="play-btn" onclick="startMines()">Играть</button>
+    </div>
+  </div>
+</div>
 
 <script>
 if (!localStorage.getItem('balance')) {
@@ -63,11 +117,14 @@ if (!localStorage.getItem('balance')) {
 }
 document.getElementById('balance').innerText = localStorage.getItem('balance');
 
-function startGame() {
+function startCrash() {
   window.location.href = 'crash.html';
 }
+function startMines() {
+  window.location.href = 'mines.html'; // на будущее
+}
 
-// Звёзды на фоне
+// Звезды на фоне
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
 let stars = [];
