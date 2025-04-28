@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Crash Game</title>
+  <title>Crash Game - Плавное Парение</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -56,9 +56,7 @@
       background: linear-gradient(90deg, #808080, #696969);
       cursor: not-allowed;
     }
-    .btn:hover {
-      opacity: 0.9;
-    }
+    .btn:hover { opacity: 0.9; }
     .message { font-size: 20px; margin-top: 20px; height: 30px; }
     .timer { margin-top: 20px; font-size: 22px; color: #00ffcc; }
     .history { margin-top: 30px; font-size: 18px; }
@@ -103,6 +101,8 @@ let roundStartTime = 0;
 let crashPoint = 0;
 let rocket = document.getElementById('rocket');
 let rocketBottom = 20;
+let rocketLeftOffset = 0;
+let rocketDirection = 1;
 let currentCoefficient = 1.00;
 let timerValue = 10;
 let gameInterval, timerInterval;
@@ -119,6 +119,7 @@ function startBettingPhase() {
   rocket.src = "https://cdn-icons-png.flaticon.com/512/616/616489.png";
   rocketBottom = 20;
   rocket.style.bottom = rocketBottom + 'px';
+  rocket.style.left = "50%";
   document.getElementById('betAmount').disabled = false;
   document.getElementById('autoCashout').disabled = false;
   document.getElementById('cashoutBtn').disabled = false;
@@ -151,17 +152,18 @@ function startPlayingPhase() {
   showMessage('Игра началась!');
   
   currentCoefficient = 1.00;
+  let startTime = Date.now();
+
   gameInterval = setInterval(() => {
-    const elapsed = (Date.now() - roundStartTime) / 1000;
+    const elapsed = (Date.now() - startTime) / 1000;
     currentCoefficient = 1 + elapsed * 0.2;
     document.getElementById('coefficient').innerText = 'x' + currentCoefficient.toFixed(2);
 
-    if (rocketBottom < 250) {
-      rocketBottom += 2;
-    } else {
-      rocketBottom += 5;
-    }
+    // Плавное парение вверх и лёгкие колебания влево-вправо
+    rocketBottom += 1.5; 
+    rocketLeftOffset = Math.sin(Date.now() / 300) * 10; // Колебания
     rocket.style.bottom = rocketBottom + 'px';
+    rocket.style.transform = `translateX(-50%) translateX(${rocketLeftOffset}px)`;
 
     if (hasBet && autoCashoutValue > 0 && currentCoefficient >= autoCashoutValue) {
       cashOut();
@@ -170,7 +172,7 @@ function startPlayingPhase() {
     if (currentCoefficient >= crashPoint) {
       crash();
     }
-  }, 100);
+  }, 50);
 }
 
 function crash() {
@@ -235,3 +237,4 @@ function updateHistory(coef) {
 
 </body>
 </html>
+
