@@ -152,15 +152,16 @@ body {
   background: #0c0c1d;
   color: white;
   position: relative;
-  overflow: hidden; /* Скрыть излишки звезд, которые выходят за пределы экрана */
+  height: 100vh; /* Устанавливаем высоту body на 100% экрана */
+  overflow: hidden; /* Скрываем все, что выходит за пределы экрана */
 }
 
 .stars {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw; /* Устанавливаем ширину на 100% экрана */
+  height: 100vh; /* Устанавливаем высоту на 100% экрана */
   z-index: -1; /* Размещаем звезды за остальными элементами */
 }
 
