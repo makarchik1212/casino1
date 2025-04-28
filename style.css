@@ -1,45 +1,46 @@
 body {
-  background-color: #1a1a1a; /* Тёмно-серый фон */
-  background-image: 
-    linear-gradient(#333 1px, transparent 1px), 
-    linear-gradient(90deg, #333 1px, transparent 1px);
-  background-size: 30px 30px; /* Размер клеток */
-  color: #fff; /* Цвет текста */
+  background-color: #0d0d0d;
+  background-image: url('https://cdn.pixabay.com/photo/2016/11/29/09/08/starry-sky-1867616_960_720.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  font-family: 'Orbitron', sans-serif;
   margin: 0;
   padding: 0;
-}
-
+  color: #fff;
 }
 
 /* Шапка */
 .header-bar {
   width: 100%;
-  background-color: #333;
-  padding: 20px 40px;
+  background-color: #1a1a1a;
+  padding: 20px;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 10;
-  text-align: left; /* ВЫРОВНЯТЬ ВЛЕВО */
+  text-align: center;
+  box-shadow: 0 0 10px yellow;
 }
 
-/* Текст шапки */
 .header-title {
   color: yellow;
-  font-size: 24px;
+  font-size: 28px;
+  letter-spacing: 2px;
 }
 
 /* Контейнер */
 .main-container {
   margin-top: 120px;
   padding: 40px;
-  background-color: #333;
+  background-color: rgba(0, 0, 0, 0.7);
   border: 4px dashed yellow;
   width: fit-content;
   min-height: 700px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+  border-radius: 20px;
+  box-shadow: 0 0 20px yellow;
 }
 
 /* Заголовок SELECT GAME */
@@ -54,36 +55,100 @@ body {
   display: flex;
   gap: 40px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .game-card {
   background-color: #111;
   border: 2px dashed yellow;
   padding: 20px;
-  width: 250px;
+  width: 220px;
+  border-radius: 15px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.game-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #ff0077;
 }
 
 .game-card h2 {
   margin-bottom: 20px;
-  color: yellow; /* ТЕКСТ CRASH И MINES ЖЁЛТЫЙ */
+  color: yellow;
 }
 
 .game-image {
-  width: 100%;
-  height: auto;
-  margin-bottom: 10px;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
 }
 
 .play-btn {
   background-color: #ff0077;
   color: white;
   border: none;
-  padding: 10px;
+  padding: 12px;
   width: 100%;
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 10px;
   cursor: pointer;
 }
 
 .play-btn:hover {
   background-color: #e6006b;
 }
+
+/* Модальное окно */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 20;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
+}
+
+.modal-content {
+  background-color: #111;
+  margin: 10% auto;
+  padding: 20px;
+  border: 2px dashed yellow;
+  width: 80%;
+  max-width: 500px;
+  text-align: center;
+  border-radius: 20px;
+  box-shadow: 0 0 20px #ff0077;
+}
+
+.close-btn {
+  color: #ff0077;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #e6006b;
+}
+
+/* Адаптив для телефонов */
+@media (max-width: 600px) {
+  .games {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .game-card {
+    width: 80%;
+  }
+  
+  .modal-content {
+    width: 90%;
+  }
+}
+
