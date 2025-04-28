@@ -8,12 +8,15 @@ body {
 }
 
 .header-bar {
-  background: #1e1e2f;
-  padding: 20px;
-  text-align: center;
-  font-size: 28px;
-  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+.balance-display {
+  font-size: 20px;
+  margin-right: 20px;
+}
+
 
 .main-container {
   padding: 30px;
