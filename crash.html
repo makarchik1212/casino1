@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Crash Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: #0c0c1d;
+      color: white;
+      text-align: center;
+      overflow: hidden;
+      height: 100vh;
+    }
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: star-animation 3s infinite;
+    }
+    @keyframes star-animation {
+      0% {opacity: 0.2; transform: scale(0.8);}
+      50% {opacity: 1; transform: scale(1);}
+      100% {opacity: 0.2; transform: scale(0.8);}
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    .balance {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      width: 150px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: block;
+      margin: 10px auto;
+      padding: 15px 30px;
+      font-size: 20px;
+      background-color: #ff4c4c;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background-color: #e63946;
+    }
+    .coefficient {
+      font-size: 40px;
+      margin: 20px 0;
+    }
+    .message {
+      font-size: 20px;
+      margin-top: 20px;
+      height: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<div class="container">
+  <h1>🚀 Crash Game</h1>
+  <div class="balance">Баланс: <span id="balance">1000</span> монет</div>
+
+  <input type="number" id="betAmount" placeholder="Ставка (мин 10)" min="10">
+
+  <button class="btn" id="startBtn" onclick="startGame()">СТАРТ</button>
+  <button class="btn" id="cashoutBtn" onclick="cashOut()" disabled>ВЫВЕСТИ</button>
+
+  <div class="coefficient" id="coefficient">x1.00</div>
+
+  <div class="message" id="message"></div>
+</div>
+
+<script>
+  let balance = 1000;
+  let currentCoefficient = 1.00;
+  let gameInterval;
+  let isPlaying = false;
+  let crashed = false;
+  let bet = 0;
+  let crashPoint = 0;
+
+  function createStars() {
+    const starsContainer = document.querySelector('.stars');
+    for (let i = 0; i < 150; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      star.style.width = Math.random() * 3 + 'px';
+      star.style.height = star.style.width;
+      star.style.top = Math.random() * 100 + '%';
+      star.style.left = Math.random() * 100 + '%';
+      starsContainer.appendChild(star);
+    }
+  }
+
+  createStars();
+
+  function startGame() {
+    const betInput = document.getElementById('betAmount');
+    bet = parseInt(betInput.value);
+
+    if (isPlaying) return;
+
+    if (isNaN(bet) || bet < 10) {
+      showMessage('Минимальная ставка 10 монет!');
+      return;
+    }
+    if (bet > balance) {
+      showMessage('Недостаточно монет!');
+      return;
+    }
+
+    balance -= bet;
+    updateBalance();
+
+    isPlaying = true;
+    crashed = false;
+    currentCoefficient = 1.00;
+    document.getElementById('coefficient').innerText = 'x' + currentCoefficient.toFixed(2);
+    showMessage('');
+
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('cashoutBtn').disabled = false;
+
+    crashPoint = (Math.random() * 3 + 1.5).toFixed(2); // Краш между x1.5 и x4.5
+
+    gameInterval = setInterval(() => {
+      currentCoefficient += Math.random() * 0.05;
+      document.getElementById('coefficient').innerText = 'x' + currentCoefficient.toFixed(2);
+
+      if (currentCoefficient >= crashPoint) {
+        crash();
+      }
+    }, 100);
+  }
+
+  function cashOut() {
+    if (!isPlaying || crashed) return;
+
+    clearInterval(gameInterval);
+    const win = Math.floor(bet * currentCoefficient);
+    balance += win;
+    updateBalance();
+    showMessage('Вы выиграли: ' + win + ' монет! 🚀');
+
+    resetGame();
+  }
+
+  function crash() {
+    clearInterval(gameInterval);
+    crashed = true;
+    document.getElementById('coefficient').innerText = '💥 CRASH!';
+    showMessage('Вы не успели... Потеряно: ' + bet + ' монет. 😢');
+    resetGame();
+  }
+
+  function resetGame() {
+    isPlaying = false;
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('cashoutBtn').disabled = true;
+  }
+
+  function updateBalance() {
+    document.getElementById('balance').innerText = balance;
+  }
+
+  function showMessage(text) {
+    document.getElementById('message').innerText = text;
+  }
+</script>
+
+</body>
+</html>
+
