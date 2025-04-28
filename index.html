@@ -2,32 +2,110 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PixelStars Казино</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #1a1a1a; /* Тёмный фон */
+      background-image: 
+        linear-gradient(#333 1px, transparent 1px), 
+        linear-gradient(90deg, #333 1px, transparent 1px);
+      background-size: 30px 30px; /* Размер клеток */
+      font-family: 'Courier New', Courier, monospace;
+      color: #fff;
+    }
+
+    header {
+      background-color: #1a1a1a;
+      padding: 20px;
+      font-size: 24px;
+      color: yellow;
+      text-align: left; /* Название слева */
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 80px);
+      padding: 20px;
+    }
+
+    .game-selection {
+      background-color: #2a2a2a;
+      padding: 30px;
+      border: 2px dashed yellow;
+      text-align: center;
+    }
+
+    .game-selection h2 {
+      margin-bottom: 20px;
+      color: yellow;
+    }
+
+    .games {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    .game {
+      background-color: #1a1a1a;
+      padding: 20px;
+      border: 2px dashed yellow;
+      width: 180px;
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: yellow; /* Название игр жёлтым */
+    }
+
+    .game img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 10px;
+    }
+
+    .play-button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #ff007a;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .play-button:hover {
+      background-color: #ff3399;
+    }
+  </style>
 </head>
 <body>
-  <header class="header-bar">
-    <div class="header-title">
-      ★ PixelStars Казино ★
-    </div>
-  </header>
 
-  <main class="main-container">
-    <h1 class="select-game-title">SELECT GAME</h1>
+<header>
+  ✦ PixelStars Казино ✦
+</header>
+
+<div class="container">
+  <div class="game-selection">
+    <h2>SELECT GAME</h2>
     <div class="games">
-      <div class="game-card">
-        <h2>CRASH GAME</h2>
-        <img src="star_rocket.png" alt="Crash Game" class="game-image">
-        <button class="play-btn">PLAY NOW</button>
+      <div class="game">
+        <!-- Здесь можно вставить иконку игры, если хочешь -->
+        <div>CRASH GAME</div>
+        <button class="play-button">PLAY NOW</button>
       </div>
-      <div class="game-card">
-        <h2>MINES GAME</h2>
-        <img src="mines_placeholder.png" alt="Mines Game" class="game-image">
-        <button class="play-btn">PLAY NOW</button>
+      <div class="game">
+        <div>MINES GAME</div>
+        <button class="play-button">PLAY NOW</button>
       </div>
     </div>
-  </main>
+  </div>
+</div>
+
 </body>
 </html>
