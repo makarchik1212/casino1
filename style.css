@@ -161,12 +161,6 @@ html, body {
   width: 100%;   /* Устанавливаем ширину на 100% */
 }
 
-.star {
-  position: absolute;
-  background-color: white;
-  border-radius: 50%;
-  animation: star-animation 2s infinite ease-in-out;
-}
 
 /* Анимация для мерцания звезд */
 @keyframes star-animation {
