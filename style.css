@@ -6,44 +6,44 @@ body {
   background-image: repeating-linear-gradient(
     45deg,
     #FFD700 0,
-    #FFD700 5px,
-    #000 5px,
-    #000 10px
+    #FFD700 2px, /* ПОЛОСКИ ПОТОНЬШЕ */
+    #000 2px,
+    #000 20px /* ПРОБЕЛЫ ПОБОЛЬШЕ */
   );
 }
 
-/* Серая шапка */
+/* Шапка */
 .header-bar {
   width: 100%;
   background-color: #333;
-  padding: 20px 0;
-  text-align: center;
+  padding: 20px 40px;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 10;
+  text-align: left; /* ВЫРОВНЯТЬ ВЛЕВО */
 }
 
-/* Название в шапке */
+/* Текст шапки */
 .header-title {
   color: yellow;
-  font-size: 30px;
+  font-size: 24px;
 }
 
-/* Контейнер игр */
+/* Контейнер */
 .main-container {
-  margin-top: 150px; /* чтобы не налезало на шапку */
+  margin-top: 120px;
   padding: 40px;
   background-color: #333;
   border: 4px dashed yellow;
   width: fit-content;
-  min-height: 700px; /* удлинили рамку! */
+  min-height: 700px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
 }
 
-/* Заголовок Select Game */
+/* Заголовок SELECT GAME */
 .select-game-title {
   font-size: 26px;
   color: yellow;
@@ -66,6 +66,7 @@ body {
 
 .game-card h2 {
   margin-bottom: 20px;
+  color: yellow; /* ТЕКСТ CRASH И MINES ЖЁЛТЫЙ */
 }
 
 .game-image {
