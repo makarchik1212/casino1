@@ -91,7 +91,7 @@
 
 <div class="container">
   <h1>🚀 Crash Game</h1>
-  <div class="balance">Баланс: <span id="balance">1000</span> монет</div>
+  <div class="balance">Баланс: <span id="balance">0</span> монет</div>
 
   <input type="number" id="betAmount" placeholder="Ставка (мин 10)" min="10">
 
@@ -104,7 +104,7 @@
 </div>
 
 <script>
-  let balance = 1000;
+  let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 1000;
   let currentCoefficient = 1.00;
   let gameInterval;
   let isPlaying = false;
@@ -126,6 +126,7 @@
   }
 
   createStars();
+  updateBalance(); // Обновляем сразу при загрузке страницы
 
   function startGame() {
     const betInput = document.getElementById('betAmount');
@@ -194,6 +195,7 @@
 
   function updateBalance() {
     document.getElementById('balance').innerText = balance;
+    localStorage.setItem('balance', balance); // Сохраняем баланс
   }
 
   function showMessage(text) {
@@ -203,4 +205,5 @@
 
 </body>
 </html>
+
 
