@@ -1,16 +1,22 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>PixelStars Казино</title>
+  <title>PixelStars</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1826/1826263.png">
 </head>
 <body>
 
+<!-- Загрузка -->
+<div id="preloader">
+  <div class="loader-text">LOADING...</div>
+  <div class="stars"></div>
+</div>
+
 <header class="header-bar">
-  <div class="header-title">✦ PixelStars Казино ✦</div>
+  <div class="header-title">✦ PixelStars ✦</div>
 </header>
 
 <div class="main-container">
@@ -26,10 +32,15 @@
       <h2>MINES GAME</h2>
       <button class="play-btn" onclick="openModal('Mines Game')">PLAY NOW</button>
     </div>
+    <div class="game-card coming-soon">
+      <img class="game-image" src="https://cdn-icons-png.flaticon.com/512/3468/3468359.png" alt="Coming Soon">
+      <h2>COMING SOON</h2>
+      <button class="play-btn disabled">SOON</button>
+    </div>
   </div>
 </div>
 
-<!-- Модальное окно -->
+<!-- Модалка -->
 <div id="gameModal" class="modal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -39,11 +50,18 @@
 </div>
 
 <script>
+  // Прелоадер
+  window.onload = function() {
+    document.getElementById('preloader').style.display = 'none';
+  }
+
+  // Открыть модалку
   function openModal(gameName) {
     document.getElementById('gameTitle').innerText = gameName;
     document.getElementById('gameModal').style.display = 'block';
   }
 
+  // Закрыть модалку
   function closeModal() {
     document.getElementById('gameModal').style.display = 'none';
   }
