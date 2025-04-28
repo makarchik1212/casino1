@@ -16,7 +16,6 @@
       height: 100vh;
       position: relative;
     }
-
     .stars-bg {
       position: fixed;
       top: 0;
@@ -29,19 +28,16 @@
       animation: moveStars 200s linear infinite;
       opacity: 0.2;
     }
-
     @keyframes moveStars {
       0% {transform: translate(0, 0);}
       100% {transform: translate(-500px, -500px);}
     }
-
     .balance {
       position: absolute;
       top: 20px;
       right: 20px;
       font-size: 20px;
     }
-
     .game-area {
       position: relative;
       width: 300px;
@@ -52,7 +48,6 @@
       overflow: hidden;
       box-shadow: 0 0 20px rgba(0,0,0,0.8);
     }
-
     .rocket {
       position: absolute;
       bottom: 20px;
@@ -61,7 +56,6 @@
       width: 50px;
       transition: bottom 0.1s linear;
     }
-
     .coefficient {
       position: absolute;
       left: 50%;
@@ -70,11 +64,9 @@
       margin-top: 10px;
       color: #ffcc00;
     }
-
     .controls {
       margin-top: 30px;
     }
-
     input {
       padding: 10px;
       font-size: 18px;
@@ -84,7 +76,6 @@
       text-align: center;
       margin: 10px;
     }
-
     .btn {
       display: inline-block;
       margin: 10px;
@@ -97,40 +88,32 @@
       cursor: pointer;
       transition: background 0.4s;
     }
-
     .btn:hover {
       background: linear-gradient(90deg, #e63946, #ff4c4c);
     }
-
     .message {
       font-size: 20px;
       margin-top: 20px;
       height: 30px;
     }
-    
     .timer {
       margin-top: 20px;
       font-size: 22px;
       color: #00ffcc;
     }
-
     .history {
       margin-top: 30px;
       font-size: 18px;
     }
-
     .history span {
       margin: 0 5px;
       padding: 5px 10px;
       border-radius: 8px;
       background: rgba(255,255,255,0.1);
     }
-
     .low { color: #00ccff; }
     .mid { color: #ffcc00; }
     .high { color: #ff3333; }
-
-    /* Анимация текста CRASH */
     .crash-text {
       animation: crashAnim 1s forwards;
       font-size: 36px;
@@ -138,7 +121,6 @@
       font-weight: bold;
       transform: scale(1);
     }
-
     @keyframes crashAnim {
       0% { transform: scale(0.5); opacity: 0; }
       50% { transform: scale(1.3); opacity: 1; }
@@ -150,7 +132,7 @@
 
 <div class="stars-bg"></div>
 
-<div class="balance">Баланс: <span id="balance">1000</span> монет</div>
+<div class="balance">Баланс: <span id="balance">0</span> монет</div>
 
 <div class="game-area">
   <img src="https://cdn-icons-png.flaticon.com/512/616/616489.png" id="rocket" class="rocket">
@@ -170,7 +152,9 @@
 <div class="history" id="history">История: </div>
 
 <script>
-let balance = 1000;
+let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 1000;
+localStorage.setItem('balance', balance);
+
 let bet = 0;
 let autoCashoutValue = 0;
 let hasBet = false;
@@ -205,7 +189,6 @@ function startTimer() {
 }
 
 function startGame() {
-  if (isPlaying) return;
   isPlaying = true;
   crashed = false;
   currentCoefficient = 1.00;
@@ -220,9 +203,9 @@ function startGame() {
     coefficientText.innerText = 'x' + currentCoefficient.toFixed(2);
 
     if (rocketBottom < 250) {
-      rocketBottom += 2; // Медленно до середины
+      rocketBottom += 2;
     } else {
-      rocketBottom += 5; // Быстро после середины
+      rocketBottom += 5;
     }
     rocket.style.bottom = rocketBottom + 'px';
     coefficientText.style.top = (rocketBottom + 60) + 'px';
@@ -241,16 +224,13 @@ function crash() {
   clearInterval(gameInterval);
   crashed = true;
   isPlaying = false;
-  rocket.src = "https://cdn-icons-png.flaticon.com/512/616/616490.png"; // Иконка взрыва
+  rocket.src = "https://cdn-icons-png.flaticon.com/512/616/616490.png"; 
   coefficientText.className = "coefficient crash-text";
   coefficientText.innerText = '💥 CRASH!';
   showMessage('Раунд завершён.');
-  if (hasBet) {
-    showMessage('Вы проиграли ' + bet + ' монет.');
-    hasBet = false;
-  }
   updateHistory(currentCoefficient);
   document.getElementById('cashoutBtn').disabled = true;
+  hasBet = false;
   setTimeout(() => {
     startTimer();
   }, 2000);
@@ -258,19 +238,13 @@ function crash() {
 
 function cashOut() {
   if (!isPlaying || crashed || !hasBet) return;
-  clearInterval(gameInterval);
   const win = Math.floor(bet * currentCoefficient);
   balance += win;
-  updateBalance();
+  localStorage.setItem('balance', balance);
+  document.getElementById('balance').innerText = balance;
   showMessage('Вы вывели: ' + win + ' монет! 🚀');
-  coefficientText.innerText = 'Вывод x' + currentCoefficient.toFixed(2);
-  isPlaying = false;
   hasBet = false;
   document.getElementById('cashoutBtn').disabled = true;
-  updateHistory(currentCoefficient);
-  setTimeout(() => {
-    startTimer();
-  }, 2000);
 }
 
 function resetRocket() {
@@ -280,12 +254,7 @@ function resetRocket() {
   coefficientText.className = "coefficient";
   coefficientText.style.top = (rocketBottom + 60) + 'px';
   coefficientText.innerText = 'Ожидание...';
-  document.getElementById('cashoutBtn').disabled = true;
   showMessage('Вы можете сделать ставку.');
-}
-
-function updateBalance() {
-  document.getElementById('balance').innerText = balance;
 }
 
 function showMessage(text) {
@@ -325,7 +294,8 @@ document.getElementById('betAmount').addEventListener('input', () => {
     document.getElementById('cashoutBtn').disabled = false;
     if (!hasBet) {
       balance -= bet;
-      updateBalance();
+      localStorage.setItem('balance', balance);
+      document.getElementById('balance').innerText = balance;
       hasBet = true;
       showMessage('Ставка принята: ' + bet + ' монет.');
     }
