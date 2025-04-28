@@ -1,15 +1,14 @@
 body {
+  background-color: #1a1a1a; /* Тёмно-серый фон */
+  background-image: 
+    linear-gradient(#333 1px, transparent 1px), 
+    linear-gradient(90deg, #333 1px, transparent 1px);
+  background-size: 30px 30px; /* Размер клеток */
+  color: #fff; /* Цвет текста */
   margin: 0;
   padding: 0;
-  font-family: 'Press Start 2P', cursive;
-  background-color: #000;
-  background-image: repeating-linear-gradient(
-    45deg,
-    #FFD700 0,
-    #FFD700 2px, /* ПОЛОСКИ ПОТОНЬШЕ */
-    #000 2px,
-    #000 20px /* ПРОБЕЛЫ ПОБОЛЬШЕ */
-  );
+}
+
 }
 
 /* Шапка */
