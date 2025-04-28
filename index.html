@@ -74,3 +74,28 @@
 
 </body>
 </html>
+<script>
+  // Функция для создания случайных звезд
+  function createStars() {
+    const starsContainer = document.createElement('div');
+    starsContainer.classList.add('stars');
+    document.body.appendChild(starsContainer);
+
+    for (let i = 0; i < 100; i++) {
+      let star = document.createElement('div');
+      star.classList.add('star');
+      star.style.top = Math.random() * 100 + '%';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.width = Math.random() * 3 + 'px';
+      star.style.height = star.style.width; // Сделаем звезды круглыми
+      star.style.animationDuration = Math.random() * 2 + 1 + 's'; // Время анимации для каждого
+      starsContainer.appendChild(star);
+    }
+  }
+
+  // Вызываем функцию, чтобы добавить звезды
+  window.onload = function() {
+    createStars();
+    document.getElementById('preloader').style.display = 'none'; // Убираем прелоадер после загрузки
+  }
+</script>
