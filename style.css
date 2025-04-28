@@ -6,13 +6,10 @@ body {
     color: #fff;
 }
 
-header {
+header.logo {
     position: absolute;
     top: 20px;
     left: 20px;
-}
-
-.logo {
     font-size: 12px;
     display: flex;
     align-items: center;
@@ -33,20 +30,24 @@ header {
     100% { transform: rotateY(360deg); }
 }
 
-.select-game {
-    margin-top: 120px;
+.main-container {
+    margin: 100px auto 0;
+    padding: 30px;
+    border: 3px dashed yellow;
+    width: fit-content;
     text-align: center;
 }
 
-h2 {
+.select-game-title {
     font-size: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    color: yellow;
 }
 
 .games {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 40px;
 }
 
 .game-card {
@@ -81,3 +82,4 @@ h2 {
 .play-btn:hover {
     background-color: #e6006b;
 }
+
