@@ -121,7 +121,12 @@ body {
   background: url('https://cdn-icons-png.flaticon.com/512/1826/1826263.png') no-repeat center center;
   background-size: contain;
 }
-
+.star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  animation: star-animation 2s infinite ease-in-out;
+}
 /* Вращение звезд */
 .rotating-star {
   display: inline-block;
