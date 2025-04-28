@@ -1,26 +1,71 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PixelStars - Казино</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>PixelStars</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="container">
-    <h1>🎮 PixelStars Казино 🎮</h1>
-    <p>Выбери режим игры:</p>
+<header>
+    <div class="logo">⭐ PIXELSTARS</div>
+    <nav>
+        <a href="#">GAMES</a>
+        <a href="#">LEADERBOARD</a>
+        <a href="#">HISTORY</a>
+        <a href="#">PROFILE</a>
+    </nav>
+    <div class="balance">1,000 ⭐</div>
+</header>
 
-    <div class="buttons">
-      <button onclick="goToCrash()">Crash</button>
-      <button onclick="goToMines()">Mines</button>
-    </div>
+<main>
+    <section class="select-game">
+        <h2>SELECT GAME</h2>
+        <div class="games">
+            <div class="game-card">
+                <h3>CRASH GAME</h3>
+                <p>Bet before the line crashes for big multipliers!</p>
+                <div class="multiplier">1.5x – 100x</div>
+                <button class="play-button red">PLAY NOW</button>
+            </div>
 
-    <p class="currency">⭐ Ваши звезды: <span id="stars">1000</span> ⭐</p>
-  </div>
+            <div class="game-card">
+                <h3>MINES GAME</h3>
+                <p>Avoid the mines, find the treasure!</p>
+                <div class="multiplier">UP TO 9.5x</div>
+                <button class="play-button green">PLAY NOW</button>
+            </div>
+        </div>
+    </section>
 
-  <script src="script.js"></script>
+    <section class="how-to-play">
+        <h2>HOW TO PLAY</h2>
+        <div class="instructions">
+            <div class="instruction">
+                <h3>CRASH GAME</h3>
+                <ul>
+                    <li>Place your bet before the round starts</li>
+                    <li>Watch the multiplier increase</li>
+                    <li>Cash out before it crashes to win</li>
+                    <li>The longer you wait, the higher the potential payout</li>
+                    <li>Be careful! If it crashes before you cash out, you lose your bet</li>
+                </ul>
+            </div>
+
+            <div class="instruction">
+                <h3>MINES GAME</h3>
+                <ul>
+                    <li>Place your bet and choose the number of mines (1-24)</li>
+                    <li>Click on cells to reveal them</li>
+                    <li>Find gems to increase your multiplier</li>
+                    <li>Hit a mine and you lose your bet</li>
+                    <li>Cash out anytime to secure your winnings</li>
+                </ul>
+                <p class="bonus">💰 New players get 1000 Telegram Stars to start! 💰</p>
+            </div>
+        </div>
+    </section>
+</main>
+
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
