@@ -82,7 +82,7 @@
       border: none;
       width: 150px;
       text-align: center;
-      margin-bottom: 20px;
+      margin: 10px;
     }
 
     .btn {
@@ -129,14 +129,13 @@
     .low { color: #00ccff; }
     .mid { color: #ffcc00; }
     .high { color: #ff3333; }
-
   </style>
 </head>
 <body>
 
 <div class="stars-bg"></div>
 
-<div class="balance">Баланс: <span id="balance">0</span> монет</div>
+<div class="balance">Баланс: <span id="balance">1000</span> монет</div>
 
 <div class="game-area">
   <img src="https://cdn-icons-png.flaticon.com/512/616/616489.png" id="rocket" class="rocket">
@@ -145,6 +144,7 @@
 
 <div class="controls">
   <input type="number" id="betAmount" placeholder="Ставка (мин 10)" min="10">
+  <input type="number" id="autoCashout" placeholder="Auto Cashout x..." min="1" step="0.01">
   <br>
   <button class="btn" id="cashoutBtn" onclick="cashOut()" disabled>ВЫВЕСТИ</button>
 </div>
@@ -155,157 +155,163 @@
 <div class="history" id="history">История: </div>
 
 <script>
-  let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 1000;
-  let bet = 0;
-  let hasBet = false;
-  let isPlaying = false;
-  let crashed = false;
-  let crashPoint = 0;
-  let currentCoefficient = 1.00;
-  let rocket = document.getElementById('rocket');
-  let coefficientText = document.getElementById('coefficient');
-  let rocketBottom = 20;
-  let timerInterval, gameInterval;
-  let timerValue = 10;
-  let history = [];
+let balance = 1000;
+let bet = 0;
+let autoCashoutValue = 0;
+let hasBet = false;
+let isPlaying = false;
+let crashed = false;
+let crashPoint = 0;
+let currentCoefficient = 1.00;
+let rocket = document.getElementById('rocket');
+let coefficientText = document.getElementById('coefficient');
+let rocketBottom = 20;
+let timerInterval, gameInterval;
+let timerValue = 10;
+let history = [];
 
-  document.getElementById('balance').innerText = balance;
+document.getElementById('balance').innerText = balance;
 
-  startTimer();
+startTimer();
 
-  function startTimer() {
-    resetRocket();
-    timerValue = 10;
+function startTimer() {
+  resetRocket();
+  timerValue = 10;
+  document.getElementById('timer').innerText = 'До начала раунда: ' + timerValue;
+  enableBetInput(true);
+  timerInterval = setInterval(() => {
+    timerValue--;
     document.getElementById('timer').innerText = 'До начала раунда: ' + timerValue;
-    timerInterval = setInterval(() => {
-      timerValue--;
-      document.getElementById('timer').innerText = 'До начала раунда: ' + timerValue;
-      if (timerValue <= 0) {
-        clearInterval(timerInterval);
-        startGame();
-      }
-    }, 1000);
-  }
-
-  function startGame() {
-    if (isPlaying) return;
-
-    isPlaying = true;
-    crashed = false;
-    currentCoefficient = 1.00;
-    crashPoint = (Math.random() * 3 + 1.5).toFixed(2);
-
-    coefficientText.innerText = 'x' + currentCoefficient.toFixed(2);
-    showMessage('');
-    document.getElementById('timer').innerText = '';
-
-    gameInterval = setInterval(() => {
-      currentCoefficient += 0.02;
-      coefficientText.innerText = 'x' + currentCoefficient.toFixed(2);
-
-      rocketBottom += 3;
-      rocket.style.bottom = rocketBottom + 'px';
-      coefficientText.style.top = (rocketBottom + 60) + 'px';
-
-      if (currentCoefficient >= crashPoint || rocketBottom > 450) {
-        crash();
-      }
-    }, 100);
-  }
-
-  function crash() {
-    clearInterval(gameInterval);
-    crashed = true;
-    isPlaying = false;
-    coefficientText.innerText = '💥 CRASH!';
-    showMessage('Раунд завершён.');
-
-    if (hasBet) {
-      showMessage('Вы проиграли ' + bet + ' монет.');
-      hasBet = false;
+    if (timerValue <= 0) {
+      clearInterval(timerInterval);
+      startGame();
     }
+  }, 1000);
+}
 
-    updateHistory(currentCoefficient);
-    document.getElementById('cashoutBtn').disabled = true;
+function startGame() {
+  if (isPlaying) return;
+  isPlaying = true;
+  crashed = false;
+  currentCoefficient = 1.00;
+  crashPoint = (Math.random() * 3 + 1.5).toFixed(2);
+  coefficientText.innerText = 'x' + currentCoefficient.toFixed(2);
+  showMessage('');
+  document.getElementById('timer').innerText = '';
+  enableBetInput(false);
 
-    setTimeout(() => {
-      startTimer();
-    }, 2000);
-  }
-
-  function cashOut() {
-    if (!isPlaying || crashed || !hasBet) return;
-
-    clearInterval(gameInterval);
-    const win = Math.floor(bet * currentCoefficient);
-    balance += win;
-    updateBalance();
-    showMessage('Вы вывели: ' + win + ' монет! 🚀');
-    coefficientText.innerText = 'Вывод x' + currentCoefficient.toFixed(2);
-    isPlaying = false;
-    document.getElementById('cashoutBtn').disabled = true;
-    hasBet = false;
-
-    updateHistory(currentCoefficient);
-
-    setTimeout(() => {
-      startTimer();
-    }, 2000);
-  }
-
-  function resetRocket() {
-    rocketBottom = 20;
+  gameInterval = setInterval(() => {
+    currentCoefficient += 0.02;
+    coefficientText.innerText = 'x' + currentCoefficient.toFixed(2);
+    rocketBottom += 3;
     rocket.style.bottom = rocketBottom + 'px';
     coefficientText.style.top = (rocketBottom + 60) + 'px';
-    coefficientText.innerText = 'Ожидание...';
-    document.getElementById('cashoutBtn').disabled = true;
-    showMessage('Вы можете сделать ставку.');
-  }
 
-  function updateBalance() {
-    document.getElementById('balance').innerText = balance;
-    localStorage.setItem('balance', balance);
-  }
-
-  function showMessage(text) {
-    document.getElementById('message').innerText = text;
-  }
-
-  function updateHistory(coef) {
-    let coefRounded = parseFloat(coef).toFixed(2);
-    let span = document.createElement('span');
-    if (coefRounded < 2) {
-      span.classList.add('low');
-    } else if (coefRounded <= 5) {
-      span.classList.add('mid');
-    } else {
-      span.classList.add('high');
-    }
-    span.innerText = 'x' + coefRounded;
-
-    history.unshift(span);
-    if (history.length > 10) {
-      history.pop();
+    if (hasBet && autoCashoutValue > 0 && currentCoefficient >= autoCashoutValue) {
+      cashOut();
     }
 
-    const historyDiv = document.getElementById('history');
-    historyDiv.innerHTML = 'История: ';
-    history.forEach(el => historyDiv.appendChild(el));
-  }
-
-  document.getElementById('betAmount').addEventListener('input', () => {
-    const betInput = document.getElementById('betAmount');
-    bet = parseInt(betInput.value);
-    if (!isNaN(bet) && bet >= 10 && bet <= balance) {
-      document.getElementById('cashoutBtn').disabled = false;
-      if (!hasBet) {
-        balance -= bet;
-        updateBalance();
-        hasBet = true;
-        showMessage('Ставка принята: ' + bet + ' монет.');
-      }
+    if (currentCoefficient >= crashPoint || rocketBottom > 450) {
+      crash();
     }
-  });
+  }, 100);
+}
+
+function crash() {
+  clearInterval(gameInterval);
+  crashed = true;
+  isPlaying = false;
+  coefficientText.innerText = '💥 CRASH!';
+  showMessage('Раунд завершён.');
+  if (hasBet) {
+    showMessage('Вы проиграли ' + bet + ' монет.');
+    hasBet = false;
+  }
+  updateHistory(currentCoefficient);
+  document.getElementById('cashoutBtn').disabled = true;
+  setTimeout(() => {
+    startTimer();
+  }, 2000);
+}
+
+function cashOut() {
+  if (!isPlaying || crashed || !hasBet) return;
+  clearInterval(gameInterval);
+  const win = Math.floor(bet * currentCoefficient);
+  balance += win;
+  updateBalance();
+  showMessage('Вы вывели: ' + win + ' монет! 🚀');
+  coefficientText.innerText = 'Вывод x' + currentCoefficient.toFixed(2);
+  isPlaying = false;
+  hasBet = false;
+  document.getElementById('cashoutBtn').disabled = true;
+  updateHistory(currentCoefficient);
+  setTimeout(() => {
+    startTimer();
+  }, 2000);
+}
+
+function resetRocket() {
+  rocketBottom = 20;
+  rocket.style.bottom = rocketBottom + 'px';
+  coefficientText.style.top = (rocketBottom + 60) + 'px';
+  coefficientText.innerText = 'Ожидание...';
+  document.getElementById('cashoutBtn').disabled = true;
+  showMessage('Вы можете сделать ставку.');
+}
+
+function updateBalance() {
+  document.getElementById('balance').innerText = balance;
+}
+
+function showMessage(text) {
+  document.getElementById('message').innerText = text;
+}
+
+function updateHistory(coef) {
+  let coefRounded = parseFloat(coef).toFixed(2);
+  let span = document.createElement('span');
+  if (coefRounded < 2) {
+    span.classList.add('low');
+  } else if (coefRounded <= 5) {
+    span.classList.add('mid');
+  } else {
+    span.classList.add('high');
+  }
+  span.innerText = 'x' + coefRounded;
+  history.unshift(span);
+  if (history.length > 10) {
+    history.pop();
+  }
+  const historyDiv = document.getElementById('history');
+  historyDiv.innerHTML = 'История: ';
+  history.forEach(el => historyDiv.appendChild(el));
+}
+
+function enableBetInput(enabled) {
+  document.getElementById('betAmount').disabled = !enabled;
+  document.getElementById('autoCashout').disabled = !enabled;
+}
+
+document.getElementById('betAmount').addEventListener('input', () => {
+  if (isPlaying) return;
+  const betInput = document.getElementById('betAmount');
+  bet = parseInt(betInput.value);
+  if (!isNaN(bet) && bet >= 10 && bet <= balance) {
+    document.getElementById('cashoutBtn').disabled = false;
+    if (!hasBet) {
+      balance -= bet;
+      updateBalance();
+      hasBet = true;
+      showMessage('Ставка принята: ' + bet + ' монет.');
+    }
+  }
+});
+
+document.getElementById('autoCashout').addEventListener('input', () => {
+  const autoInput = document.getElementById('autoCashout');
+  autoCashoutValue = parseFloat(autoInput.value);
+});
 
 </script>
 
