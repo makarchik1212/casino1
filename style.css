@@ -161,6 +161,15 @@ html, body {
   width: 100%;   /* Устанавливаем ширину на 100% */
 }
 
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%; /* Звезды занимают всю ширину экрана */
+  height: 100%; /* Звезды занимают всю высоту экрана */
+  z-index: -1; /* Размещаем звезды за остальными элементами */
+}
+
 .star {
   position: absolute;
   background-color: white;
