@@ -129,6 +129,21 @@
     .low { color: #00ccff; }
     .mid { color: #ffcc00; }
     .high { color: #ff3333; }
+
+    /* Анимация текста CRASH */
+    .crash-text {
+      animation: crashAnim 1s forwards;
+      font-size: 36px;
+      color: red;
+      font-weight: bold;
+      transform: scale(1);
+    }
+
+    @keyframes crashAnim {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.7; }
+    }
   </style>
 </head>
 <body>
@@ -203,7 +218,12 @@ function startGame() {
   gameInterval = setInterval(() => {
     currentCoefficient += 0.02;
     coefficientText.innerText = 'x' + currentCoefficient.toFixed(2);
-    rocketBottom += 3;
+
+    if (rocketBottom < 250) {
+      rocketBottom += 2; // Медленно до середины
+    } else {
+      rocketBottom += 5; // Быстро после середины
+    }
     rocket.style.bottom = rocketBottom + 'px';
     coefficientText.style.top = (rocketBottom + 60) + 'px';
 
@@ -221,6 +241,8 @@ function crash() {
   clearInterval(gameInterval);
   crashed = true;
   isPlaying = false;
+  rocket.src = "https://cdn-icons-png.flaticon.com/512/616/616490.png"; // Иконка взрыва
+  coefficientText.className = "coefficient crash-text";
   coefficientText.innerText = '💥 CRASH!';
   showMessage('Раунд завершён.');
   if (hasBet) {
@@ -253,7 +275,9 @@ function cashOut() {
 
 function resetRocket() {
   rocketBottom = 20;
+  rocket.src = "https://cdn-icons-png.flaticon.com/512/616/616489.png";
   rocket.style.bottom = rocketBottom + 'px';
+  coefficientText.className = "coefficient";
   coefficientText.style.top = (rocketBottom + 60) + 'px';
   coefficientText.innerText = 'Ожидание...';
   document.getElementById('cashoutBtn').disabled = true;
@@ -312,7 +336,6 @@ document.getElementById('autoCashout').addEventListener('input', () => {
   const autoInput = document.getElementById('autoCashout');
   autoCashoutValue = parseFloat(autoInput.value);
 });
-
 </script>
 
 </body>
