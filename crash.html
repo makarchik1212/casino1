@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Crash Game - Плавное Парение</title>
+  <title>Crash Game</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -32,12 +32,43 @@
       0% {transform: translate(0, 0);}
       100% {transform: translate(-500px, -500px);}
     }
-    .balance { position: absolute; top: 20px; right: 20px; font-size: 20px; }
-    .game-area { position: relative; width: 300px; height: 500px; background: rgba(30,30,47,0.9); margin: 100px auto 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
-    .rocket { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 50px; transition: bottom 0.1s linear; }
-    .coefficient { position: absolute; left: 50%; transform: translateX(-50%); font-size: 24px; margin-top: 10px; color: #ffcc00; }
+    .balance { position: absolute; top: 20px; right: 20px; font-size: 22px; }
+    .game-area {
+      position: relative;
+      width: 400px;
+      height: 500px;
+      background: rgba(30,30,47,0.9);
+      margin: 100px auto 20px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+    .rocket {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      transition: bottom 0.1s linear, transform 0.1s linear;
+    }
+    .coefficient {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+      margin-top: 10px;
+      color: #ffcc00;
+    }
     .controls { margin-top: 30px; }
-    input { padding: 10px; font-size: 18px; border-radius: 10px; border: none; width: 150px; text-align: center; margin: 10px; }
+    input {
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      width: 150px;
+      text-align: center;
+      margin: 10px;
+    }
     .btn {
       display: inline-block;
       margin: 10px;
@@ -60,7 +91,12 @@
     .message { font-size: 20px; margin-top: 20px; height: 30px; }
     .timer { margin-top: 20px; font-size: 22px; color: #00ffcc; }
     .history { margin-top: 30px; font-size: 18px; }
-    .history span { margin: 0 5px; padding: 5px 10px; border-radius: 8px; background: rgba(255,255,255,0.1); }
+    .history span {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+    }
     .low { color: #00ccff; }
     .mid { color: #ffcc00; }
     .high { color: #ff3333; }
@@ -102,7 +138,6 @@ let crashPoint = 0;
 let rocket = document.getElementById('rocket');
 let rocketBottom = 20;
 let rocketLeftOffset = 0;
-let rocketDirection = 1;
 let currentCoefficient = 1.00;
 let timerValue = 10;
 let gameInterval, timerInterval;
@@ -120,6 +155,7 @@ function startBettingPhase() {
   rocketBottom = 20;
   rocket.style.bottom = rocketBottom + 'px';
   rocket.style.left = "50%";
+  rocket.style.transform = "translateX(-50%)";
   document.getElementById('betAmount').disabled = false;
   document.getElementById('autoCashout').disabled = false;
   document.getElementById('cashoutBtn').disabled = false;
@@ -150,7 +186,7 @@ function startPlayingPhase() {
   document.getElementById('cashoutBtn').className = "btn btn-gray";
   document.getElementById('cashoutBtn').innerText = "ИГРАЕТСЯ...";
   showMessage('Игра началась!');
-  
+
   currentCoefficient = 1.00;
   let startTime = Date.now();
 
@@ -159,11 +195,16 @@ function startPlayingPhase() {
     currentCoefficient = 1 + elapsed * 0.2;
     document.getElementById('coefficient').innerText = 'x' + currentCoefficient.toFixed(2);
 
-    // Плавное парение вверх и лёгкие колебания влево-вправо
-    rocketBottom += 1.5; 
-    rocketLeftOffset = Math.sin(Date.now() / 300) * 10; // Колебания
+    if (rocketBottom < 250) {
+      rocketBottom += 1.5;
+    } else {
+      // Плавные колебания по X и Y на месте
+      let offsetX = Math.sin(Date.now() / 300) * 10;
+      let offsetY = Math.cos(Date.now() / 400) * 5;
+      rocket.style.transform = `translateX(-50%) translate(${offsetX}px, ${offsetY}px)`;
+    }
+
     rocket.style.bottom = rocketBottom + 'px';
-    rocket.style.transform = `translateX(-50%) translateX(${rocketLeftOffset}px)`;
 
     if (hasBet && autoCashoutValue > 0 && currentCoefficient >= autoCashoutValue) {
       cashOut();
