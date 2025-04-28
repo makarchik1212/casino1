@@ -2,66 +2,124 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>PixelStars</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/616/616489.png">
+  <title>Главная - Crash Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      background: black;
+      color: white;
+      text-align: center;
+      height: 100vh;
+      position: relative;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    h1 {
+      margin-top: 100px;
+      font-size: 48px;
+      color: #00ffcc;
+      text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+    }
+    .balance {
+      margin-top: 20px;
+      font-size: 24px;
+    }
+    .start-btn {
+      margin-top: 30px;
+      padding: 15px 30px;
+      font-size: 24px;
+      background: linear-gradient(90deg, #4CAF50, #45A049);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .start-btn:hover {
+      background: linear-gradient(90deg, #45A049, #4CAF50);
+    }
+  </style>
 </head>
 <body>
 
-<!-- Прелоадер -->
-<div id="preloader">
-  <img src="https://cdn-icons-png.flaticon.com/512/616/616489.png" alt="Star" class="preloader-star">
-  <div class="loader-text">LOADING...</div>
-</div>
+<canvas id="stars"></canvas>
 
-<!-- Фон -->
-<div class="stars-bg"></div>
+<h1>Добро пожаловать в Crash Game</h1>
+<div class="balance">Ваш баланс: <span id="balance">0</span> монет</div>
+<button class="start-btn" onclick="startGame()">Играть</button>
 
-<!-- Основной контент -->
-<header class="header-bar">
-  <div class="header-title">
-    <span class="rotating-star">✦</span> PixelStars <span class="rotating-star">✦</span>
-  </div>
-  <div class="balance-display">Баланс: <span id="balance">0</span> монет</div>
-</header>
-
-<div class="main-container">
-  <div class="welcome-title">Добро пожаловать в <b>PixelStars</b>!</div>
-  <div class="select-game-title">Выберите игру:</div>
-  
-  <div class="games">
-    <div class="game-card">
-      <img class="game-image" src="crash_game.png" alt="Crash Game">
-      <h2>CRASH GAME</h2>
-      <a href="crash.html" class="play-btn">PLAY NOW</a>
-    </div>
-    
-    <div class="game-card">
-      <img class="game-image" src="mines_game.png" alt="Mines Game">
-      <h2>MINES GAME</h2>
-      <a href="#" class="play-btn" onclick="alert('Скоро будет доступно!')">PLAY NOW</a>
-    </div>
-  </div>
-</div>
-
-<!-- Скрипты -->
 <script>
-  window.onload = function() {
-    document.getElementById('preloader').style.opacity = '0';
-    document.getElementById('preloader').style.pointerEvents = 'none';
-    setTimeout(() => {
-      document.getElementById('preloader').style.display = 'none';
-      document.querySelectorAll('.rotating-star').forEach(star => star.style.display = 'inline');
-    }, 500);
-    updateBalanceDisplay();
-  }
+if (!localStorage.getItem('balance')) {
+  localStorage.setItem('balance', 1000);
+}
+document.getElementById('balance').innerText = localStorage.getItem('balance');
 
-  function updateBalanceDisplay() {
-    let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 1000;
-    document.getElementById('balance').innerText = balance;
-    localStorage.setItem('balance', balance);
-  }
+function startGame() {
+  window.location.href = 'crash.html';
+}
+
+// Звёзды на фоне
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function createStar() {
+  return {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 2,
+    speed: Math.random() * 0.5 + 0.2,
+    opacity: Math.random()
+  };
+}
+
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(star => {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+    ctx.fill();
+  });
+}
+
+function moveStars() {
+  stars.forEach(star => {
+    star.y += star.speed;
+    star.opacity -= 0.002;
+    if (star.y > canvas.height || star.opacity <= 0) {
+      Object.assign(star, createStar());
+      star.y = 0;
+    }
+  });
+}
+
+function loop() {
+  moveStars();
+  drawStars();
+  requestAnimationFrame(loop);
+}
+
+for (let i = 0; i < 150; i++) {
+  stars.push(createStar());
+}
+loop();
 </script>
 
 </body>
