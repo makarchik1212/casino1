@@ -144,7 +144,7 @@ body {
     width: 90%;
   }
 }
-/* Звездное небо */
+/* Общие стили */
 body {
   font-family: 'Orbitron', sans-serif;
   margin: 0;
@@ -152,6 +152,7 @@ body {
   background: #0c0c1d;
   color: white;
   position: relative;
+  overflow: hidden; /* Скрыть излишки звезд, которые выходят за пределы экрана */
 }
 
 .stars {
@@ -160,25 +161,19 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: transparent;
-  z-index: -1;
+  z-index: -1; /* Размещаем звезды за остальными элементами */
 }
 
 .star {
   position: absolute;
   background-color: white;
   border-radius: 50%;
-  animation: star-animation 2s infinite;
+  animation: star-animation 2s infinite ease-in-out;
 }
 
+/* Анимация для мерцания звезд */
 @keyframes star-animation {
   0% { opacity: 0.1; transform: scale(0.8); }
   50% { opacity: 1; transform: scale(1); }
   100% { opacity: 0.1; transform: scale(0.8); }
-}
-
-/* Создание случайных звезд */
-@keyframes star-animation {
-  0% { opacity: 0.2; }
-  100% { opacity: 1; }
 }
