@@ -1,22 +1,20 @@
-/* ФОН С ЖЁЛТЫМИ ЛИНИЯМИ */
+/* Фон */
 body {
     margin: 0;
     padding: 0;
     font-family: 'Press Start 2P', cursive;
-    color: #fff;
     background-color: #000;
     background-image: repeating-linear-gradient(
         45deg,
         #FFD700 0,
         #FFD700 5px,
-        #000000 5px,
-        #000000 10px
+        #000 5px,
+        #000 10px
     );
-    background-size: 20px 20px;
 }
 
-/* ВЕРХНЯЯ СЕРАЯ ПОЛОСА */
-header.top-bar {
+/* Верхняя серая полоса */
+.header-bar {
     width: 100%;
     background-color: #333;
     padding: 20px 0;
@@ -24,63 +22,51 @@ header.top-bar {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1000;
+    z-index: 10;
 }
 
-/* ЛОГО В СЕРЕДИНЕ */
-.logo {
-    font-size: 24px; /* увеличил размер */
+/* Название */
+.header-title {
     color: yellow;
+    font-size: 28px;
 }
 
-/* КРУТЯЩИЕСЯ ЗВЁЗДЫ */
-.star {
-    color: yellow;
-    display: inline-block;
-    animation: rotateStar 3s linear infinite;
-}
-
-@keyframes rotateStar {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* ГЛАВНЫЙ КОНТЕЙНЕР */
+/* Контейнер с играми */
 .main-container {
-    margin: 150px auto 0;
-    padding: 60px;
+    margin-top: 140px;
+    padding: 40px;
+    background-color: #333;
     border: 4px dashed yellow;
-    background-color: #333; /* серый фон */
     width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
     text-align: center;
-    min-height: 500px; /* удлинил рамку вниз */
+    min-height: 600px; /* Удлинили! */
 }
 
-/* SELECT GAME */
+/* Заголовок Select Game */
 .select-game-title {
-    font-size: 20px;
-    margin-bottom: 30px;
+    font-size: 24px;
     color: yellow;
+    margin-bottom: 40px;
 }
 
-/* ИГРЫ */
+/* Игры */
 .games {
     display: flex;
-    justify-content: center;
     gap: 40px;
+    justify-content: center;
 }
 
-/* КАРТОЧКИ ИГР */
 .game-card {
-    background: #111;
-    padding: 20px;
+    background-color: #111;
     border: 2px dashed yellow;
-    border-radius: 10px;
+    padding: 20px;
     width: 250px;
 }
 
-.game-card h3 {
-    margin-bottom: 10px;
+.game-card h2 {
+    margin-bottom: 20px;
 }
 
 .game-image {
@@ -89,7 +75,6 @@ header.top-bar {
     margin-bottom: 10px;
 }
 
-/* КНОПКА */
 .play-btn {
     background-color: #ff0077;
     color: white;
@@ -98,10 +83,8 @@ header.top-bar {
     width: 100%;
     font-size: 12px;
     cursor: pointer;
-    margin-top: 10px;
 }
 
 .play-btn:hover {
     background-color: #e6006b;
 }
-
