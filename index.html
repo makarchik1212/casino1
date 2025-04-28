@@ -15,10 +15,11 @@
   <div class="stars"></div>
 </div>
 
+<!-- Основной контент -->
 <header class="header-bar">
   <div class="header-title">
     <span class="rotating-star">✦</span> PixelStars <span class="rotating-star">✦</span>
-    <div class="balance-display">Баланс: <span id="balance">0</span> монет</div>
+    <div class="balance-display" style="margin-top:10px;">Баланс: <span id="balance">0</span> монет</div>
   </div>
 </header>
 
@@ -39,7 +40,7 @@
   </div>
 </div>
 
-<!-- Модалка -->
+<!-- Модалка для других игр -->
 <div id="gameModal" class="modal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -60,6 +61,8 @@
         document.getElementById('preloader').style.display = 'none';
       }, 500);
     }, 1000); // 1 секунда показа прелоадера
+
+    updateBalanceDisplay(); // Загружаем баланс при старте
   }
 
   // Создание звезд
@@ -78,7 +81,14 @@
     }
   }
 
-  // Открыть модалку
+  // Загрузка и отображение баланса
+  function updateBalanceDisplay() {
+    let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 1000;
+    document.getElementById('balance').innerText = balance;
+    localStorage.setItem('balance', balance); // если первый раз — сохранить в localStorage
+  }
+
+  // Открыть модалку для других игр
   function openModal(gameName, gameUrl) {
     document.getElementById('gameTitle').innerText = gameName;
     document.getElementById('gameFrame').src = gameUrl;
@@ -94,7 +104,7 @@
     modal.style.opacity = '0';
     setTimeout(() => {
       modal.style.display = 'none';
-      document.getElementById('gameFrame').src = ''; // Очищаем игру
+      document.getElementById('gameFrame').src = '';
     }, 300);
   }
 
@@ -108,14 +118,3 @@
 
 </body>
 </html>
-<script>
-  // Показ баланса на главной странице
-  let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 1000;
-
-  function updateBalanceDisplay() {
-    document.getElementById('balance').innerText = balance;
-  }
-
-  updateBalanceDisplay();
-</script>
-
