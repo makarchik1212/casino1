@@ -32,100 +32,21 @@
       0% {transform: translate(0, 0);}
       100% {transform: translate(-500px, -500px);}
     }
-    .balance {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 20px;
-    }
-    .game-area {
-      position: relative;
-      width: 300px;
-      height: 500px;
-      background: rgba(30,30,47,0.9);
-      margin: 100px auto 20px;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(0,0,0,0.8);
-    }
-    .rocket {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50px;
-      transition: bottom 0.1s linear;
-    }
-    .coefficient {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 24px;
-      margin-top: 10px;
-      color: #ffcc00;
-    }
-    .controls {
-      margin-top: 30px;
-    }
-    input {
-      padding: 10px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      width: 150px;
-      text-align: center;
-      margin: 10px;
-    }
-    .btn {
-      display: inline-block;
-      margin: 10px;
-      padding: 15px 30px;
-      font-size: 20px;
-      background: linear-gradient(90deg, #ff4c4c, #e63946);
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      transition: background 0.4s;
-    }
-    .btn:hover {
-      background: linear-gradient(90deg, #e63946, #ff4c4c);
-    }
-    .message {
-      font-size: 20px;
-      margin-top: 20px;
-      height: 30px;
-    }
-    .timer {
-      margin-top: 20px;
-      font-size: 22px;
-      color: #00ffcc;
-    }
-    .history {
-      margin-top: 30px;
-      font-size: 18px;
-    }
-    .history span {
-      margin: 0 5px;
-      padding: 5px 10px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.1);
-    }
+    .balance { position: absolute; top: 20px; right: 20px; font-size: 20px; }
+    .game-area { position: relative; width: 300px; height: 500px; background: rgba(30,30,47,0.9); margin: 100px auto 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+    .rocket { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 50px; transition: bottom 0.1s linear; }
+    .coefficient { position: absolute; left: 50%; transform: translateX(-50%); font-size: 24px; margin-top: 10px; color: #ffcc00; }
+    .controls { margin-top: 30px; }
+    input { padding: 10px; font-size: 18px; border-radius: 10px; border: none; width: 150px; text-align: center; margin: 10px; }
+    .btn { display: inline-block; margin: 10px; padding: 15px 30px; font-size: 20px; background: linear-gradient(90deg, #ff4c4c, #e63946); border: none; border-radius: 10px; color: white; cursor: pointer; transition: background 0.4s; }
+    .btn:hover { background: linear-gradient(90deg, #e63946, #ff4c4c); }
+    .message { font-size: 20px; margin-top: 20px; height: 30px; }
+    .timer { margin-top: 20px; font-size: 22px; color: #00ffcc; }
+    .history { margin-top: 30px; font-size: 18px; }
+    .history span { margin: 0 5px; padding: 5px 10px; border-radius: 8px; background: rgba(255,255,255,0.1); }
     .low { color: #00ccff; }
     .mid { color: #ffcc00; }
     .high { color: #ff3333; }
-    .crash-text {
-      animation: crashAnim 1s forwards;
-      font-size: 36px;
-      color: red;
-      font-weight: bold;
-      transform: scale(1);
-    }
-    @keyframes crashAnim {
-      0% { transform: scale(0.5); opacity: 0; }
-      50% { transform: scale(1.3); opacity: 1; }
-      100% { transform: scale(1); opacity: 0.7; }
-    }
   </style>
 </head>
 <body>
@@ -158,49 +79,59 @@ localStorage.setItem('balance', balance);
 let bet = 0;
 let autoCashoutValue = 0;
 let hasBet = false;
-let isPlaying = false;
-let crashed = false;
+let phase = 'betting'; // фаза: betting | playing | crashed
+let roundStartTime = 0;
 let crashPoint = 0;
-let currentCoefficient = 1.00;
 let rocket = document.getElementById('rocket');
-let coefficientText = document.getElementById('coefficient');
 let rocketBottom = 20;
-let timerInterval, gameInterval;
+let currentCoefficient = 1.00;
 let timerValue = 10;
+let gameInterval, timerInterval;
 let history = [];
 
 document.getElementById('balance').innerText = balance;
 
-startTimer();
+window.onload = function() {
+  startBettingPhase();
+};
 
-function startTimer() {
-  resetRocket();
+function startBettingPhase() {
+  phase = 'betting';
+  rocket.src = "https://cdn-icons-png.flaticon.com/512/616/616489.png";
+  rocketBottom = 20;
+  rocket.style.bottom = rocketBottom + 'px';
+  document.getElementById('betAmount').disabled = false;
+  document.getElementById('autoCashout').disabled = false;
+  document.getElementById('cashoutBtn').disabled = true;
+  document.getElementById('coefficient').innerText = "Ожидание...";
+  document.getElementById('timer').innerText = "До начала раунда: 10";
+  showMessage('Вы можете сделать ставку.');
+
   timerValue = 10;
-  document.getElementById('timer').innerText = 'До начала раунда: ' + timerValue;
-  enableBetInput(true);
   timerInterval = setInterval(() => {
     timerValue--;
-    document.getElementById('timer').innerText = 'До начала раунда: ' + timerValue;
+    document.getElementById('timer').innerText = "До начала раунда: " + timerValue;
     if (timerValue <= 0) {
       clearInterval(timerInterval);
-      startGame();
+      startPlayingPhase();
     }
   }, 1000);
 }
 
-function startGame() {
-  isPlaying = true;
-  crashed = false;
-  currentCoefficient = 1.00;
+function startPlayingPhase() {
+  phase = 'playing';
+  hasBet = false;
+  roundStartTime = Date.now();
   crashPoint = (Math.random() * 3 + 1.5).toFixed(2);
-  coefficientText.innerText = 'x' + currentCoefficient.toFixed(2);
-  showMessage('');
-  document.getElementById('timer').innerText = '';
-  enableBetInput(false);
-
+  document.getElementById('betAmount').disabled = true;
+  document.getElementById('autoCashout').disabled = true;
+  showMessage('Игра началась!');
+  
+  currentCoefficient = 1.00;
   gameInterval = setInterval(() => {
-    currentCoefficient += 0.02;
-    coefficientText.innerText = 'x' + currentCoefficient.toFixed(2);
+    const elapsed = (Date.now() - roundStartTime) / 1000;
+    currentCoefficient = 1 + elapsed * 0.2;
+    document.getElementById('coefficient').innerText = 'x' + currentCoefficient.toFixed(2);
 
     if (rocketBottom < 250) {
       rocketBottom += 2;
@@ -208,13 +139,12 @@ function startGame() {
       rocketBottom += 5;
     }
     rocket.style.bottom = rocketBottom + 'px';
-    coefficientText.style.top = (rocketBottom + 60) + 'px';
 
     if (hasBet && autoCashoutValue > 0 && currentCoefficient >= autoCashoutValue) {
       cashOut();
     }
 
-    if (currentCoefficient >= crashPoint || rocketBottom > 450) {
+    if (currentCoefficient >= crashPoint) {
       crash();
     }
   }, 100);
@@ -222,44 +152,49 @@ function startGame() {
 
 function crash() {
   clearInterval(gameInterval);
-  crashed = true;
-  isPlaying = false;
-  rocket.src = "https://cdn-icons-png.flaticon.com/512/616/616490.png"; 
-  coefficientText.className = "coefficient crash-text";
-  coefficientText.innerText = '💥 CRASH!';
-  showMessage('Раунд завершён.');
+  phase = 'crashed';
+  rocket.src = "https://cdn-icons-png.flaticon.com/512/616/616490.png";
+  document.getElementById('coefficient').innerText = "💥 CRASH!";
+  showMessage('Краш! Следующий раунд скоро...');
   updateHistory(currentCoefficient);
-  document.getElementById('cashoutBtn').disabled = true;
-  hasBet = false;
+  
   setTimeout(() => {
-    startTimer();
-  }, 2000);
+    startBettingPhase();
+  }, 5000);
 }
 
 function cashOut() {
-  if (!isPlaying || crashed || !hasBet) return;
+  if (phase !== 'playing' || !hasBet) return;
   const win = Math.floor(bet * currentCoefficient);
   balance += win;
   localStorage.setItem('balance', balance);
   document.getElementById('balance').innerText = balance;
-  showMessage('Вы вывели: ' + win + ' монет! 🚀');
-  hasBet = false;
   document.getElementById('cashoutBtn').disabled = true;
-}
-
-function resetRocket() {
-  rocketBottom = 20;
-  rocket.src = "https://cdn-icons-png.flaticon.com/512/616/616489.png";
-  rocket.style.bottom = rocketBottom + 'px';
-  coefficientText.className = "coefficient";
-  coefficientText.style.top = (rocketBottom + 60) + 'px';
-  coefficientText.innerText = 'Ожидание...';
-  showMessage('Вы можете сделать ставку.');
+  hasBet = false;
+  showMessage('Вы вывели: ' + win + ' монет!');
 }
 
 function showMessage(text) {
   document.getElementById('message').innerText = text;
 }
+
+document.getElementById('betAmount').addEventListener('input', () => {
+  if (phase !== 'betting') return;
+  const value = parseInt(document.getElementById('betAmount').value);
+  if (!isNaN(value) && value >= 10 && value <= balance) {
+    bet = value;
+    hasBet = true;
+    document.getElementById('cashoutBtn').disabled = false;
+    showMessage('Ставка сделана: ' + bet + ' монет.');
+    balance -= bet;
+    localStorage.setItem('balance', balance);
+    document.getElementById('balance').innerText = balance;
+  }
+});
+
+document.getElementById('autoCashout').addEventListener('input', () => {
+  autoCashoutValue = parseFloat(document.getElementById('autoCashout').value);
+});
 
 function updateHistory(coef) {
   let coefRounded = parseFloat(coef).toFixed(2);
@@ -280,33 +215,8 @@ function updateHistory(coef) {
   historyDiv.innerHTML = 'История: ';
   history.forEach(el => historyDiv.appendChild(el));
 }
-
-function enableBetInput(enabled) {
-  document.getElementById('betAmount').disabled = !enabled;
-  document.getElementById('autoCashout').disabled = !enabled;
-}
-
-document.getElementById('betAmount').addEventListener('input', () => {
-  if (isPlaying) return;
-  const betInput = document.getElementById('betAmount');
-  bet = parseInt(betInput.value);
-  if (!isNaN(bet) && bet >= 10 && bet <= balance) {
-    document.getElementById('cashoutBtn').disabled = false;
-    if (!hasBet) {
-      balance -= bet;
-      localStorage.setItem('balance', balance);
-      document.getElementById('balance').innerText = balance;
-      hasBet = true;
-      showMessage('Ставка принята: ' + bet + ' монет.');
-    }
-  }
-});
-
-document.getElementById('autoCashout').addEventListener('input', () => {
-  const autoInput = document.getElementById('autoCashout');
-  autoCashoutValue = parseFloat(autoInput.value);
-});
 </script>
 
 </body>
 </html>
+
