@@ -1,9 +1,18 @@
+/* ФОН С ЖЁЛТЫМИ ЛИНИЯМИ */
 body {
     margin: 0;
     padding: 0;
-    background: #000;
     font-family: 'Press Start 2P', cursive;
     color: #fff;
+    background-color: #000;
+    background-image: repeating-linear-gradient(
+        45deg,
+        #FFD700 0,
+        #FFD700 5px,
+        #000000 5px,
+        #000000 10px
+    );
+    background-size: 20px 20px;
 }
 
 /* ЛОГО СЛЕВА */
@@ -11,7 +20,7 @@ header.logo {
     position: fixed;
     top: 10px;
     left: 10px;
-    font-size: 10px;
+    font-size: 14px; /* УВЕЛИЧИЛ РАЗМЕР */
     display: flex;
     align-items: center;
     gap: 5px;
@@ -33,7 +42,8 @@ header.logo {
 .main-container {
     margin: 150px auto 0;
     padding: 30px;
-    border: 4px dashed yellow; /* рамка вокруг всех игр */
+    border: 4px dashed yellow;
+    background-color: #333; /* СЕРЫЙ ФОН ВНУТРИ РАМКИ */
     width: fit-content;
     text-align: center;
 }
@@ -52,7 +62,7 @@ header.logo {
     gap: 40px;
 }
 
-/* КАРТОЧКА ИГРЫ */
+/* КАРТОЧКИ ИГР */
 .game-card {
     background: #111;
     padding: 20px;
