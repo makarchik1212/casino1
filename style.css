@@ -1,5 +1,3 @@
-/* style.css */
-
 body {
     background-color: #0d0d0d;
     color: white;
@@ -9,91 +7,89 @@ body {
 }
 
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    text-align: center;
     padding: 20px;
-    background-color: #111;
-    border-bottom: 2px solid yellow;
-}
-
-.logo {
+    color: #FFD700;
     font-size: 20px;
-    color: yellow;
 }
 
-nav a {
-    margin: 0 10px;
-    color: white;
-    text-decoration: none;
+.select-game {
+    text-align: center;
+    margin: 40px 0;
 }
 
-.balance {
-    background-color: black;
-    padding: 5px 10px;
-    border: 2px solid yellow;
-    border-radius: 5px;
-}
-
-main {
-    padding: 20px;
-}
-
-.select-game h2, .how-to-play h2 {
-    color: yellow;
-    font-size: 18px;
+.select-game h2 {
+    color: #FFD700;
+    margin-bottom: 20px;
 }
 
 .games {
     display: flex;
-    gap: 20px;
-    margin-top: 20px;
+    justify-content: center;
+    gap: 30px;
 }
 
 .game-card {
-    background-color: #1a1a1a;
+    background: #1a1a1a;
+    border: 2px dashed #FFD700;
     padding: 20px;
-    border: 2px solid #333;
-    flex: 1;
-    text-align: center;
+    width: 250px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.game-card:hover {
+    transform: scale(1.05);
+}
+
+.game-card h3 {
+    color: #ffffff;
 }
 
 .multiplier {
+    color: #FFD700;
     margin: 10px 0;
-    color: yellow;
-    font-size: 14px;
 }
 
-.play-button {
-    padding: 10px;
-    font-family: inherit;
-    font-size: 12px;
+.play-btn {
+    background: #ff0066;
     border: none;
-    cursor: pointer;
-}
-
-.play-button.red {
-    background-color: red;
+    padding: 10px 20px;
+    font-size: 12px;
     color: white;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-.play-button.green {
-    background-color: limegreen;
-    color: black;
+.play-btn:hover {
+    background: #cc0052;
 }
 
 .how-to-play {
-    margin-top: 40px;
+    margin: 40px;
+}
+
+.how-to-play h2 {
+    text-align: center;
+    color: #FFD700;
+    margin-bottom: 20px;
 }
 
 .instructions {
     display: flex;
-    gap: 20px;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    color: #ffffff;
 }
 
-.instruction {
-    background-color: #1a1a1a;
-    padding: 20px;
-    flex: 1;
-    border: 2
+.instructions div {
+    width: 300px;
+}
 
+.bonus-text {
+    text-align: center;
+    color: #FFD700;
+    margin-top: 30px;
+    font-size: 14px;
+}
