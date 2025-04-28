@@ -15,22 +15,29 @@ body {
     background-size: 20px 20px;
 }
 
-/* ЛОГО СЛЕВА */
-header.logo {
+/* ВЕРХНЯЯ СЕРАЯ ПОЛОСА */
+header.top-bar {
+    width: 100%;
+    background-color: #333;
+    padding: 20px 0;
+    text-align: center;
     position: fixed;
-    top: 10px;
-    left: 10px;
-    font-size: 14px; /* УВЕЛИЧИЛ РАЗМЕР */
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    top: 0;
+    left: 0;
     z-index: 1000;
 }
 
-/* ЗВЁЗДЫ КРУТЯТСЯ */
+/* ЛОГО В СЕРЕДИНЕ */
+.logo {
+    font-size: 24px; /* увеличил размер */
+    color: yellow;
+}
+
+/* КРУТЯЩИЕСЯ ЗВЁЗДЫ */
 .star {
     color: yellow;
-    animation: rotateStar 2s linear infinite;
+    display: inline-block;
+    animation: rotateStar 3s linear infinite;
 }
 
 @keyframes rotateStar {
@@ -41,11 +48,12 @@ header.logo {
 /* ГЛАВНЫЙ КОНТЕЙНЕР */
 .main-container {
     margin: 150px auto 0;
-    padding: 30px;
+    padding: 60px;
     border: 4px dashed yellow;
-    background-color: #333; /* СЕРЫЙ ФОН ВНУТРИ РАМКИ */
+    background-color: #333; /* серый фон */
     width: fit-content;
     text-align: center;
+    min-height: 500px; /* удлинил рамку вниз */
 }
 
 /* SELECT GAME */
@@ -96,3 +104,4 @@ header.logo {
 .play-btn:hover {
     background-color: #e6006b;
 }
+
