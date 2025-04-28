@@ -6,50 +6,53 @@ body {
     color: #fff;
 }
 
+/* ЛОГО СЛЕВА */
 header.logo {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 12px;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 10px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 5px;
+    z-index: 1000;
 }
 
+/* ЗВЁЗДЫ КРУТЯТСЯ */
 .star {
     color: yellow;
-    display: inline-block;
+    animation: rotateStar 2s linear infinite;
 }
 
-.rotating {
-    animation: spin 2s linear infinite;
+@keyframes rotateStar {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-@keyframes spin {
-    0% { transform: rotateY(0deg); }
-    100% { transform: rotateY(360deg); }
-}
-
+/* ГЛАВНЫЙ КОНТЕЙНЕР */
 .main-container {
-    margin: 100px auto 0;
+    margin: 150px auto 0;
     padding: 30px;
-    border: 3px dashed yellow;
+    border: 4px dashed yellow; /* рамка вокруг всех игр */
     width: fit-content;
     text-align: center;
 }
 
+/* SELECT GAME */
 .select-game-title {
     font-size: 20px;
     margin-bottom: 30px;
     color: yellow;
 }
 
+/* ИГРЫ */
 .games {
     display: flex;
     justify-content: center;
     gap: 40px;
 }
 
+/* КАРТОЧКА ИГРЫ */
 .game-card {
     background: #111;
     padding: 20px;
@@ -68,6 +71,7 @@ header.logo {
     margin-bottom: 10px;
 }
 
+/* КНОПКА */
 .play-btn {
     background-color: #ff0077;
     color: white;
@@ -82,4 +86,3 @@ header.logo {
 .play-btn:hover {
     background-color: #e6006b;
 }
-
