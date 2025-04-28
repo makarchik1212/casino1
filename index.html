@@ -6,115 +6,56 @@
   <title>PixelStars Казино</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      background-color: #0d0d0d;
-      background-image: url('https://cdn.pixabay.com/photo/2016/11/29/09/08/starry-sky-1867616_960_720.jpg');
-      background-size: cover;
-      background-attachment: fixed;
-      font-family: 'Orbitron', sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #fff;
-    }
-    header {
-      width: 100%;
-      background-color: #1a1a1a;
-      padding: 20px;
-      text-align: center;
-      font-size: 32px;
-      font-weight: bold;
-      color: yellow;
-      letter-spacing: 2px;
-      box-shadow: 0 0 10px yellow;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 10;
-    }
-    .main-container {
-      margin-top: 120px;
-      padding: 40px;
-      background-color: rgba(0, 0, 0, 0.7);
-      border: 4px dashed yellow;
-      width: fit-content;
-      min-height: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
-      border-radius: 20px;
-      box-shadow: 0 0 20px yellow;
-    }
-    .select-game-title {
-      font-size: 28px;
-      color: yellow;
-      margin-bottom: 40px;
-    }
-    .games {
-      display: flex;
-      gap: 40px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .game-card {
-      background-color: #111;
-      border: 2px dashed yellow;
-      padding: 20px;
-      width: 220px;
-      border-radius: 15px;
-      transition: 0.3s;
-    }
-    .game-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #ff0077;
-    }
-    .game-card img {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 20px;
-    }
-    .game-card h2 {
-      font-size: 20px;
-      color: yellow;
-      margin-bottom: 20px;
-    }
-    .play-btn {
-      background-color: #ff0077;
-      color: white;
-      border: none;
-      padding: 12px;
-      width: 100%;
-      font-size: 14px;
-      font-weight: bold;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .play-btn:hover {
-      background-color: #e6006b;
-    }
-  </style>
 </head>
 <body>
 
-<header>
-  ✦ PixelStars Казино ✦
+<header class="header-bar">
+  <div class="header-title">✦ PixelStars Казино ✦</div>
 </header>
 
 <div class="main-container">
   <div class="select-game-title">SELECT GAME</div>
   <div class="games">
     <div class="game-card">
-      <img src="https://cdn-icons-png.flaticon.com/512/1040/1040230.png" alt="Crash Game">
+      <img class="game-image" src="https://cdn-icons-png.flaticon.com/512/1040/1040230.png" alt="Crash Game">
       <h2>CRASH GAME</h2>
-      <button class="play-btn">PLAY NOW</button>
+      <button class="play-btn" onclick="openModal('Crash Game')">PLAY NOW</button>
     </div>
     <div class="game-card">
-      <img src="https://cdn-icons-png.flaticon.com/512/833/833524.png" alt="Mines Game">
+      <img class="game-image" src="https://cdn-icons-png.flaticon.com/512/833/833524.png" alt="Mines Game">
       <h2>MINES GAME</h2>
-      <button class="play-btn">PLAY NOW</button>
+      <button class="play-btn" onclick="openModal('Mines Game')">PLAY NOW</button>
     </div>
   </div>
 </div>
 
+<!-- Модальное окно -->
+<div id="gameModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h2 id="gameTitle">Game</h2>
+    <p>Тут будет ваша игра!</p>
+  </div>
+</div>
+
+<script>
+  function openModal(gameName) {
+    document.getElementById('gameTitle').innerText = gameName;
+    document.getElementById('gameModal').style.display = 'block';
+  }
+
+  function closeModal() {
+    document.getElementById('gameModal').style.display = 'none';
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById('gameModal');
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+</script>
+
 </body>
 </html>
+
