@@ -1,25 +1,45 @@
 body {
-    background-color: #0d0d0d;
-    color: white;
-    font-family: 'Press Start 2P', cursive;
     margin: 0;
     padding: 0;
+    background: #000;
+    font-family: 'Press Start 2P', cursive;
+    color: #fff;
 }
 
 header {
-    text-align: center;
-    padding: 20px;
-    color: #FFD700;
-    font-size: 20px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.logo {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.star {
+    color: yellow;
+    display: inline-block;
+}
+
+.rotating {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
 }
 
 .select-game {
+    margin-top: 120px;
     text-align: center;
-    margin: 40px 0;
 }
 
-.select-game h2 {
-    color: #FFD700;
+h2 {
+    font-size: 20px;
     margin-bottom: 20px;
 }
 
@@ -30,66 +50,34 @@ header {
 }
 
 .game-card {
-    background: #1a1a1a;
-    border: 2px dashed #FFD700;
+    background: #111;
     padding: 20px;
-    width: 250px;
+    border: 2px dashed yellow;
     border-radius: 10px;
-    transition: transform 0.3s;
-}
-
-.game-card:hover {
-    transform: scale(1.05);
+    width: 250px;
 }
 
 .game-card h3 {
-    color: #ffffff;
+    margin-bottom: 10px;
 }
 
-.multiplier {
-    color: #FFD700;
-    margin: 10px 0;
+.game-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
 }
 
 .play-btn {
-    background: #ff0066;
-    border: none;
-    padding: 10px 20px;
-    font-size: 12px;
+    background-color: #ff0077;
     color: white;
-    margin-top: 10px;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    font-size: 12px;
     cursor: pointer;
-    transition: background 0.3s;
+    margin-top: 10px;
 }
 
 .play-btn:hover {
-    background: #cc0052;
-}
-
-.how-to-play {
-    margin: 40px;
-}
-
-.how-to-play h2 {
-    text-align: center;
-    color: #FFD700;
-    margin-bottom: 20px;
-}
-
-.instructions {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    color: #ffffff;
-}
-
-.instructions div {
-    width: 300px;
-}
-
-.bonus-text {
-    text-align: center;
-    color: #FFD700;
-    margin-top: 30px;
-    font-size: 14px;
+    background-color: #e6006b;
 }
