@@ -5,13 +5,13 @@
   <title>PixelStars</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1826/1826263.png">
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/616/616489.png">
 </head>
 <body>
 
 <!-- Прелоадер -->
 <div id="preloader">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Black_Star.png/240px-Black_Star.png" alt="Star" class="preloader-star">
+  <img src="https://cdn-icons-png.flaticon.com/512/616/616489.png" alt="Star" class="preloader-star">
   <div class="loader-text">LOADING...</div>
 </div>
 
@@ -45,7 +45,7 @@
   </div>
 </div>
 
-<!-- Модалка для Mines -->
+<!-- Модалка -->
 <div id="gameModal" class="modal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -61,11 +61,8 @@
     document.getElementById('preloader').style.pointerEvents = 'none';
     setTimeout(() => {
       document.getElementById('preloader').style.display = 'none';
-
-      // Показываем звезды в шапке после загрузки
       document.querySelectorAll('.rotating-star').forEach(star => star.style.display = 'inline');
     }, 500);
-
     updateBalanceDisplay();
   }
 
