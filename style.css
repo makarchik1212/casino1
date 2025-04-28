@@ -144,3 +144,41 @@ body {
     width: 90%;
   }
 }
+/* Звездное небо */
+body {
+  font-family: 'Orbitron', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #0c0c1d;
+  color: white;
+  position: relative;
+}
+
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: -1;
+}
+
+.star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  animation: star-animation 2s infinite;
+}
+
+@keyframes star-animation {
+  0% { opacity: 0.1; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.1; transform: scale(0.8); }
+}
+
+/* Создание случайных звезд */
+@keyframes star-animation {
+  0% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
