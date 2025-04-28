@@ -17,6 +17,24 @@
       position: relative;
     }
 
+    .stars-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300%;
+      height: 300%;
+      background: url('https://cdn.pixabay.com/photo/2018/01/04/20/54/space-3061796_1280.jpg') repeat;
+      background-size: cover;
+      z-index: -1;
+      animation: moveStars 200s linear infinite;
+      opacity: 0.2;
+    }
+
+    @keyframes moveStars {
+      0% {transform: translate(0, 0);}
+      100% {transform: translate(-500px, -500px);}
+    }
+
     .balance {
       position: absolute;
       top: 20px;
@@ -72,16 +90,16 @@
       margin: 10px;
       padding: 15px 30px;
       font-size: 20px;
-      background-color: #ff4c4c;
+      background: linear-gradient(90deg, #ff4c4c, #e63946);
       border: none;
       border-radius: 10px;
       color: white;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.4s;
     }
 
     .btn:hover {
-      background-color: #e63946;
+      background: linear-gradient(90deg, #e63946, #ff4c4c);
     }
 
     .message {
@@ -95,9 +113,28 @@
       font-size: 22px;
       color: #00ffcc;
     }
+
+    .history {
+      margin-top: 30px;
+      font-size: 18px;
+    }
+
+    .history span {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .low { color: #00ccff; }
+    .mid { color: #ffcc00; }
+    .high { color: #ff3333; }
+
   </style>
 </head>
 <body>
+
+<div class="stars-bg"></div>
 
 <div class="balance">Баланс: <span id="balance">0</span> монет</div>
 
@@ -115,6 +152,8 @@
 <div class="timer" id="timer">До начала раунда: 10</div>
 <div class="message" id="message"></div>
 
+<div class="history" id="history">История: </div>
+
 <script>
   let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 1000;
   let bet = 0;
@@ -128,10 +167,11 @@
   let rocketBottom = 20;
   let timerInterval, gameInterval;
   let timerValue = 10;
+  let history = [];
 
   document.getElementById('balance').innerText = balance;
 
-  startTimer(); // старт при загрузке страницы
+  startTimer();
 
   function startTimer() {
     resetRocket();
@@ -153,7 +193,7 @@
     isPlaying = true;
     crashed = false;
     currentCoefficient = 1.00;
-    crashPoint = (Math.random() * 3 + 1.5).toFixed(2); 
+    crashPoint = (Math.random() * 3 + 1.5).toFixed(2);
 
     coefficientText.innerText = 'x' + currentCoefficient.toFixed(2);
     showMessage('');
@@ -185,11 +225,12 @@
       hasBet = false;
     }
 
+    updateHistory(currentCoefficient);
     document.getElementById('cashoutBtn').disabled = true;
 
     setTimeout(() => {
       startTimer();
-    }, 2000); // 2 секунды перед новым таймером
+    }, 2000);
   }
 
   function cashOut() {
@@ -204,6 +245,8 @@
     isPlaying = false;
     document.getElementById('cashoutBtn').disabled = true;
     hasBet = false;
+
+    updateHistory(currentCoefficient);
 
     setTimeout(() => {
       startTimer();
@@ -226,6 +269,28 @@
 
   function showMessage(text) {
     document.getElementById('message').innerText = text;
+  }
+
+  function updateHistory(coef) {
+    let coefRounded = parseFloat(coef).toFixed(2);
+    let span = document.createElement('span');
+    if (coefRounded < 2) {
+      span.classList.add('low');
+    } else if (coefRounded <= 5) {
+      span.classList.add('mid');
+    } else {
+      span.classList.add('high');
+    }
+    span.innerText = 'x' + coefRounded;
+
+    history.unshift(span);
+    if (history.length > 10) {
+      history.pop();
+    }
+
+    const historyDiv = document.getElementById('history');
+    historyDiv.innerHTML = 'История: ';
+    history.forEach(el => historyDiv.appendChild(el));
   }
 
   document.getElementById('betAmount').addEventListener('input', () => {
