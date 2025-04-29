@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Crash Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo">🌟 PixelStars ✦</div>
+    <div class="balance">Баланс: <span id="balance">100</span> звёзд</div>
+  </div>
+  <div class="crash-container">
+    <div class="crash-box">
+      <div id="coefficient">x1.00</div>
+      <img id="rocket" src="assets/crash_game.png" class="rocket">
+    </div>
+    <div class="controls">
+      <input type="number" id="betAmount" placeholder="Ставка (мин 10)" min="10">
+      <input type="number" id="autoCashout" placeholder="Авто x..." step="0.01">
+      <button id="cashoutBtn">Ставить</button>
+    </div>
+    <div id="message"></div>
+    <div class="history" id="history">История:</div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
