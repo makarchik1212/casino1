@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>PixelStars - Главная</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: black;
+      color: white;
+      text-align: center;
+    }
+    .game-container {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 100px;
+    }
+    .game-card {
+      background: #1e1e2f;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 20px #00ffff33;
+      width: 200px;
+      transition: transform 0.3s;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+    }
+    .game-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+    .btn {
+      background: #e63946;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .balance {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="balance">Баланс: <span id="balance">0</span> звёзд</div>
+  <h1>Выберите игру:</h1>
+  <div class="game-container">
+    <div class="game-card">
+      <img src="crash_game.png" alt="Crash Game">
+      <h3>Crash Game</h3>
+      <button class="btn" onclick="location.href='crash.html'">Играть</button>
+    </div>
+    <div class="game-card">
+      <img src="mines_game.png" alt="Mines Game">
+      <h3>Mines Game</h3>
+      <button class="btn">Играть</button>
+    </div>
+  </div>
+  <script>
+    if (!localStorage.getItem("balance")) {
+      localStorage.setItem("balance", "100");
+    }
+    document.getElementById("balance").innerText = localStorage.getItem("balance");
+  </script>
+</body>
+</html>
