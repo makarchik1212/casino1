@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Crash Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: #0c0c1d;
+      color: white;
+      text-align: center;
+    }
+    .balance {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 18px;
+      color: #00ffc3;
+    }
+    .game-area {
+      margin: 100px auto 20px;
+      width: 300px;
+      height: 500px;
+      background: #1e1e2f;
+      border-radius: 20px;
+      position: relative;
+      box-shadow: 0 0 20px #00ffff33;
+    }
+    #rocket {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    input {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 5px;
+      width: 120px;
+      margin: 5px;
+    }
+    .btn {
+      padding: 10px 20px;
+      background: #e63946;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .timer {
+      margin-top: 10px;
+      color: #00ffc3;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="balance">Баланс: <span id="balance">0</span> звёзд</div>
+  <div class="game-area">
+    <img id="rocket" src="rocket.png" alt="rocket">
+    <div id="coefficient" style="position:absolute;top:10px;width:100%;text-align:center;font-size:24px;color:yellow;">Ожидание...</div>
+  </div>
+  <div class="controls">
+    <input type="number" id="betAmount" placeholder="Ставка (мин 10)" min="10">
+    <button class="btn" id="placeBet">Ставить</button>
+  </div>
+  <div class="timer" id="timer">До начала: 10</div>
+
+  <script>
+    let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 100;
+    let rocket = document.getElementById("rocket");
+    let coeffText = document.getElementById("coefficient");
+    let timerEl = document.getElementById("timer");
+    let balanceEl = document.getElementById("balance");
+    let betBtn = document.getElementById("placeBet");
+    let betAmount = document.getElementById("betAmount");
+
+    balanceEl.innerText = balance;
+    let currentCoeff = 1.00;
+    let crashPoint = Math.random() * 3 + 1.5;
+    let timer = 10;
+    let interval;
+
+    function startRound() {
+      coeffText.innerText = 'x1.00';
+      currentCoeff = 1.00;
+      let bottom = 20;
+      rocket.style.bottom = bottom + 'px';
+
+      interval = setInterval(() => {
+        currentCoeff += 0.02;
+        coeffText.innerText = 'x' + currentCoeff.toFixed(2);
+        bottom += 4;
+        rocket.style.bottom = bottom + 'px';
+
+        if (currentCoeff >= crashPoint) {
+          clearInterval(interval);
+          coeffText.innerText = '💥 CRASH!';
+          setTimeout(initCountdown, 2000);
+        }
+      }, 100);
+    }
+
+    function initCountdown() {
+      crashPoint = Math.random() * 3 + 1.5;
+      let t = 10;
+      timerEl.innerText = 'До начала: ' + t;
+      let countdown = setInterval(() => {
+        t--;
+        timerEl.innerText = 'До начала: ' + t;
+        if (t <= 0) {
+          clearInterval(countdown);
+          startRound();
+        }
+      }, 1000);
+    }
+
+    betBtn.onclick = () => {
+      const bet = parseInt(betAmount.value);
+      if (!isNaN(bet) && bet >= 10 && bet <= balance) {
+        balance -= bet;
+        localStorage.setItem('balance', balance);
+        balanceEl.innerText = balance;
+        alert('Ставка принята: ' + bet + ' звёзд');
+      }
+    }
+
+    initCountdown();
+  </script>
+</body>
+</html>
