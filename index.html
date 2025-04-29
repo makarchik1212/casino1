@@ -2,218 +2,183 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Crash Game - Pixel Style</title>
+  <title>PixelStars - Главная</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 0;
       font-family: 'Orbitron', sans-serif;
-      background-color: #0c0c1d;
       overflow: hidden;
+      background: black;
       color: white;
       text-align: center;
+      height: 100vh;
+      position: relative;
     }
-    .stars-bg {
+    canvas {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: url('https://i.imgur.com/Nz3ZP3z.png') repeat;
-      background-size: cover;
+      width: 100%;
+      height: 100%;
       z-index: -1;
-      animation: moveStars 100s linear infinite;
-      opacity: 0.3;
     }
-    @keyframes moveStars {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(-300px, -300px); }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0c0c1d;
+      padding: 10px 20px;
+      font-size: 24px;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #00ffcc;
+      text-shadow: 0 0 10px #00ffcc;
     }
     .balance {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 20px;
-      color: #00ffcc;
-    }
-    .game-area {
-      position: relative;
-      width: 400px;
-      height: 500px;
-      margin: 100px auto 20px;
-      background: rgba(20, 20, 30, 0.9);
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-      overflow: hidden;
-    }
-    .rocket {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 64px;
-      transition: transform 0.2s ease-in-out;
-    }
-    .coefficient {
-      position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
       font-size: 22px;
-      color: #ffcc00;
+      color: #ffffff;
     }
-    .controls {
+    .content {
+      margin-top: 50px;
+    }
+    .game-selection {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
       margin-top: 30px;
     }
-    input {
-      padding: 10px;
-      font-size: 16px;
-      width: 150px;
-      border-radius: 8px;
-      margin: 5px;
-      border: none;
-      text-align: center;
+    .card {
+      background: rgba(30, 30, 47, 0.9);
+      padding: 20px;
+      border-radius: 20px;
+      width: 200px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
     }
-    .btn {
-      padding: 12px 25px;
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+    }
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .card h2 {
+      margin-top: 15px;
+      font-size: 20px;
+    }
+    .play-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
       font-size: 18px;
       background: linear-gradient(90deg, #ff4c4c, #e63946);
       border: none;
       border-radius: 10px;
       color: white;
       cursor: pointer;
-      margin-top: 10px;
-      transition: transform 0.2s;
+      transition: background 0.3s, transform 0.3s;
     }
-    .btn:hover {
+    .play-btn:hover {
+      background: linear-gradient(90deg, #e63946, #ff4c4c);
       transform: scale(1.05);
-    }
-    .message {
-      font-size: 18px;
-      height: 28px;
-      margin-top: 10px;
-    }
-    .timer {
-      margin-top: 15px;
-      font-size: 20px;
-      color: #00ffcc;
     }
   </style>
 </head>
 <body>
 
-<div class="stars-bg"></div>
-<div class="balance">Баланс: <span id="balance">0</span> монет</div>
+<canvas id="stars"></canvas>
 
-<div class="game-area">
-  <img src="crash_game.png" id="rocket" class="rocket" alt="rocket">
-  <div class="coefficient" id="coefficient">Ожидание...</div>
+<div class="header">
+  <div class="logo">PixelStars ✦</div>
+  <div class="balance">Баланс: <span id="balance">0</span> монет</div>
 </div>
 
-<div class="controls">
-  <input type="number" id="betAmount" placeholder="Ставка (мин 10)">
-  <input type="number" id="autoCashout" placeholder="Авто x..." step="0.01">
-  <br>
-  <button class="btn" id="cashoutBtn" onclick="makeBet()">Ставить</button>
+<div class="content">
+  <h1>Выберите игру:</h1>
+  <div class="game-selection">
+    <div class="card">
+      <img src="crash_game.png" alt="Crash Game">
+      <h2>Crash Game</h2>
+      <button class="play-btn" onclick="startCrash()">Играть</button>
+    </div>
+    <div class="card">
+      <img src="mines_game.png" alt="Mines Game">
+      <h2>Mines Game</h2>
+      <button class="play-btn" onclick="startMines()">Играть</button>
+    </div>
+  </div>
 </div>
-
-<div class="timer" id="timer">До начала: 10</div>
-<div class="message" id="message"></div>
 
 <script>
-let balance = localStorage.getItem('balance') ? parseInt(localStorage.getItem('balance')) : 1000;
-let rocket = document.getElementById('rocket');
-let rocketBottom = 20;
-let currentCoefficient = 1.00;
-let hasBet = false;
-let bet = 0;
-let autoCashoutValue = 0;
-let crashPoint = 0;
-let interval;
-let phase = 'waiting';
+if (!localStorage.getItem('balance')) {
+  localStorage.setItem('balance', 1000);
+}
+document.getElementById('balance').innerText = localStorage.getItem('balance');
 
-document.getElementById('balance').innerText = balance;
-
-function makeBet() {
-  const betInput = parseInt(document.getElementById('betAmount').value);
-  const autoCash = parseFloat(document.getElementById('autoCashout').value);
-  if (!isNaN(betInput) && betInput >= 10 && betInput <= balance) {
-    bet = betInput;
-    autoCashoutValue = autoCash;
-    balance -= bet;
-    localStorage.setItem('balance', balance);
-    document.getElementById('balance').innerText = balance;
-    hasBet = true;
-    showMessage('Ставка принята: ' + bet + ' монет.');
-  }
+function startCrash() {
+  window.location.href = 'crash.html';
+}
+function startMines() {
+  window.location.href = 'mines.html';
 }
 
-function startGame() {
-  crashPoint = (Math.random() * 3 + 1.5).toFixed(2);
-  currentCoefficient = 1.00;
-  rocketBottom = 20;
-  rocket.style.bottom = rocketBottom + 'px';
-  rocket.src = "crash_game.png";
-  phase = 'playing';
+// Звёздный фон
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
 
-  interval = setInterval(() => {
-    currentCoefficient += 0.02;
-    rocketBottom += (rocketBottom < 260) ? 1 : Math.sin(Date.now() / 200) * 2;
-    rocket.style.bottom = rocketBottom + 'px';
-    rocket.style.transform = `translateX(-50%) translateY(${Math.sin(Date.now()/300)*2}px)`;
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
-    document.getElementById('coefficient').innerText = 'x' + currentCoefficient.toFixed(2);
+function createStar() {
+  return {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 2,
+    speed: Math.random() * 0.5 + 0.2,
+    opacity: Math.random()
+  };
+}
 
-    if (hasBet && autoCashoutValue > 0 && currentCoefficient >= autoCashoutValue) {
-      cashOut();
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(star => {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+    ctx.fill();
+  });
+}
+
+function moveStars() {
+  stars.forEach(star => {
+    star.y += star.speed;
+    star.opacity -= 0.002;
+    if (star.y > canvas.height || star.opacity <= 0) {
+      Object.assign(star, createStar());
+      star.y = 0;
     }
-
-    if (currentCoefficient >= crashPoint) {
-      crash();
-    }
-  }, 50);
+  });
 }
 
-function crash() {
-  clearInterval(interval);
-  rocket.src = "explosion_pixel.png";
-  document.getElementById('coefficient').innerText = "💥 CRASH!";
-  showMessage('Краш! Следующий раунд скоро...');
-  setTimeout(startRound, 4000);
+function loop() {
+  moveStars();
+  drawStars();
+  requestAnimationFrame(loop);
 }
 
-function cashOut() {
-  if (!hasBet) return;
-  const win = Math.floor(bet * currentCoefficient);
-  balance += win;
-  localStorage.setItem('balance', balance);
-  document.getElementById('balance').innerText = balance;
-  hasBet = false;
-  showMessage('Вы вывели: ' + win + ' монет!');
+for (let i = 0; i < 150; i++) {
+  stars.push(createStar());
 }
-
-function startRound() {
-  document.getElementById('coefficient').innerText = "Ожидание...";
-  document.getElementById('timer').innerText = "До начала: 10";
-  showMessage("Можно сделать ставку");
-  let countdown = 10;
-  phase = 'waiting';
-  let wait = setInterval(() => {
-    countdown--;
-    document.getElementById('timer').innerText = "До начала: " + countdown;
-    if (countdown <= 0) {
-      clearInterval(wait);
-      startGame();
-    }
-  }, 1000);
-}
-
-function showMessage(text) {
-  document.getElementById('message').innerText = text;
-}
-
-startRound();
+loop();
 </script>
 
 </body>
