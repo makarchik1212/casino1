@@ -8,27 +8,24 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: #0c0c1d;
-      overflow: hidden;
+      background: radial-gradient(circle at center, #0c0c1d, #050510 100%);
       color: white;
-      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      overflow: hidden;
     }
 
-    .stars-bg {
+    .stars {
       position: fixed;
-      top: 0;
-      left: 0;
       width: 100%;
       height: 100%;
       background: url('https://www.transparenttextures.com/patterns/stardust.png');
       background-size: 100px 100px;
-      animation: starMove 200s linear infinite;
+      opacity: 0.15;
+      animation: moveStars 200s linear infinite;
       z-index: -1;
-      opacity: 0.2;
     }
 
-    @keyframes starMove {
+    @keyframes moveStars {
       0% { background-position: 0 0; }
       100% { background-position: -1000px -1000px; }
     }
@@ -38,17 +35,22 @@
       top: 20px;
       right: 30px;
       font-size: 18px;
-      color: #00ffcc;
+      color: #00ffc8;
+    }
+
+    .container {
+      text-align: center;
+      margin-top: 100px;
     }
 
     .game-area {
+      position: relative;
       width: 400px;
       height: 500px;
-      margin: 100px auto 20px;
-      background: rgba(20, 20, 30, 0.9);
+      margin: 0 auto;
+      background: #181828;
       border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
-      position: relative;
+      box-shadow: 0 0 20px rgba(0,255,255,0.2);
       overflow: hidden;
     }
 
@@ -58,20 +60,19 @@
       left: 50%;
       transform: translateX(-50%);
       width: 64px;
-      transition: transform 0.2s ease-in-out;
     }
 
     .coefficient {
       position: absolute;
-      top: 15px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 22px;
+      font-size: 24px;
       color: #ffcc00;
     }
 
     .controls {
-      margin-top: 30px;
+      margin-top: 25px;
     }
 
     input {
@@ -79,8 +80,8 @@
       font-size: 16px;
       width: 150px;
       border-radius: 8px;
-      margin: 5px;
       border: none;
+      margin: 5px;
       text-align: center;
     }
 
@@ -93,45 +94,60 @@
       color: white;
       cursor: pointer;
       margin-top: 10px;
-      transition: transform 0.2s;
     }
 
     .btn:hover {
-      transform: scale(1.05);
+      background: linear-gradient(90deg, #e63946, #ff4c4c);
     }
 
     .message {
-      font-size: 18px;
-      height: 28px;
       margin-top: 10px;
+      font-size: 16px;
+      height: 20px;
     }
 
     .timer {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #00ffc8;
+    }
+
+    .history {
       margin-top: 15px;
-      font-size: 20px;
-      color: #00ffcc;
+      font-size: 16px;
+      color: #ccc;
+    }
+
+    .history span {
+      margin: 0 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #262638;
     }
   </style>
 </head>
 <body>
 
-<div class="stars-bg"></div>
+<div class="stars"></div>
 <div class="balance">Баланс: <span id="balance">0</span> монет</div>
 
-<div class="game-area">
-  <img src="crash_game.png" id="rocket" class="rocket" alt="rocket">
-  <div class="coefficient" id="coefficient">Ожидание...</div>
-</div>
+<div class="container">
+  <div class="game-area">
+    <img src="crash_game.png" id="rocket" class="rocket" alt="rocket">
+    <div class="coefficient" id="coefficient">Ожидание...</div>
+  </div>
 
-<div class="controls">
-  <input type="number" id="betAmount" placeholder="Ставка (мин 10)">
-  <input type="number" id="autoCashout" placeholder="Авто x..." step="0.01">
-  <br>
-  <button class="btn" id="cashoutBtn" onclick="makeBet()">Ставить</button>
-</div>
+  <div class="controls">
+    <input type="number" id="betAmount" placeholder="Ставка (мин 10)">
+    <input type="number" id="autoCashout" placeholder="Авто x..." step="0.01">
+    <br>
+    <button class="btn" id="betBtn" onclick="makeBet()">Ставить</button>
+  </div>
 
-<div class="timer" id="timer">До начала: 10</div>
-<div class="message" id="message"></div>
+  <div class="timer" id="timer">До начала: 10</div>
+  <div class="message" id="message"></div>
+  <div class="history" id="history">История: </div>
+</div>
 
 <script>
 let balance = localStorage.getItem('balance');
@@ -144,11 +160,12 @@ balance = parseInt(balance);
 let rocket = document.getElementById('rocket');
 let rocketBottom = 20;
 let currentCoefficient = 1.00;
-let hasBet = false;
 let bet = 0;
 let autoCashoutValue = 0;
+let hasBet = false;
 let crashPoint = 0;
 let interval;
+let history = [];
 
 document.getElementById('balance').innerText = balance;
 
@@ -162,7 +179,7 @@ function makeBet() {
     localStorage.setItem('balance', balance);
     document.getElementById('balance').innerText = balance;
     hasBet = true;
-    showMessage('Ставка принята: ' + bet + ' монет.');
+    showMessage('Ставка принята: ' + bet + ' монет');
   }
 }
 
@@ -196,6 +213,7 @@ function crash() {
   rocket.src = "explosion_pixel.png";
   document.getElementById('coefficient').innerText = "💥 CRASH!";
   showMessage('Краш! Следующий раунд скоро...');
+  updateHistory(currentCoefficient);
   setTimeout(startRound, 4000);
 }
 
@@ -226,6 +244,12 @@ function startRound() {
 
 function showMessage(text) {
   document.getElementById('message').innerText = text;
+}
+
+function updateHistory(coef) {
+  history.unshift(coef.toFixed(2));
+  if (history.length > 5) history.pop();
+  document.getElementById('history').innerHTML = "История: " + history.map(c => `<span>x${c}</span>`).join('');
 }
 
 startRound();
