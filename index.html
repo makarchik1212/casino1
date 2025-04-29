@@ -57,10 +57,11 @@
       border-radius: 20px;
       width: 200px;
       box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-      transition: transform 0.3s;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
     .card:hover {
       transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
     }
     .card img {
       width: 100%;
@@ -79,10 +80,11 @@
       border-radius: 10px;
       color: white;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.3s;
     }
     .play-btn:hover {
       background: linear-gradient(90deg, #e63946, #ff4c4c);
+      transform: scale(1.05);
     }
   </style>
 </head>
@@ -121,10 +123,10 @@ function startCrash() {
   window.location.href = 'crash.html';
 }
 function startMines() {
-  window.location.href = 'mines.html'; // на будущее
+  window.location.href = 'mines.html'; // можно позже подключить
 }
 
-// Звезды на фоне
+// Звёздный фон
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
 let stars = [];
