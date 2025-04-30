@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>PixelStars</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1826/1826263.png">
+</head>
+<body>
+
+<!-- Прелоадер -->
+<div id="preloader">
+  <div class="loader-text">LOADING...</div>
+  <div class="stars"></div>
+</div>
+
+<!-- Основной контент -->
+<header class="header-bar">
+  <div class="header-title">
+    <span class="rotating-star">✦</span> PixelStars <span class="rotating-star">✦</span>
+  </div>
+</header>
+
+<div class="main-container">
+  <div class="select-game-title">SELECT GAME</div>
+  <div class="games">
+    <div class="game-card">
+      <img class="game-image" src="crash_game.png" alt="Crash Game">
+      <h2>CRASH GAME</h2>
+      <button class="play-btn" onclick="openModal('Crash Game', 'crash.html')">PLAY NOW</button>
+    </div>
+    
+    <div class="game-card">
+      <img class="game-image" src="mines_game.png" alt="Mines Game">
+      <h2>MINES GAME</h2>
+      <button class="play-btn" onclick="openModal('Mines Game', 'https://example.com/mines')">PLAY NOW</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка -->
+<div id="gameModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h2 id="gameTitle">Game</h2>
+    <iframe id="gameFrame" src="" frameborder="0" style="width:100%; height:400px; border-radius:10px; margin-top:10px;"></iframe>
+  </div>
+</div>
+
+<!-- Скрипты -->
+<script>
+  // Прелоадер и Звезды
+  window.onload = function() {
+    createStars();
+    setTimeout(() => {
+      document.getElementById('preloader').style.opacity = '0';
+      document.getElementById('preloader').style.pointerEvents = 'none';
+      setTimeout(() => {
+        document.getElementById('preloader').style.display = 'none';
+      }, 500);
+    }, 1000); // 1 секунда показа прелоадера
+  }
+
+  // Создание звезд
+  function createStars() {
+    const starsContainer = document.querySelector('.stars');
+    for (let i = 0; i < 200; i++) {
+      let star = document.createElement('div');
+      star.classList.add('star');
+      star.style.top = Math.random() * 100 + '%';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.width = Math.random() * 3 + 1 + 'px';
+      star.style.height = star.style.width;
+      star.style.animationDuration = Math.random() * 2 + 2 + 's';
+      star.style.animationDelay = Math.random() * 2 + 's';
+      starsContainer.appendChild(star);
+    }
+  }
+
+  // Открыть модалку
+  function openModal(gameName, gameUrl) {
+    document.getElementById('gameTitle').innerText = gameName;
+    document.getElementById('gameFrame').src = gameUrl;
+    document.getElementById('gameModal').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('gameModal').style.opacity = '1';
+    }, 10);
+  }
+
+  // Закрыть модалку
+  function closeModal() {
+    const modal = document.getElementById('gameModal');
+    modal.style.opacity = '0';
+    setTimeout(() => {
+      modal.style.display = 'none';
+      document.getElementById('gameFrame').src = ''; // Очищаем игру
+    }, 300);
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById('gameModal');
+    if (event.target == modal) {
+      closeModal();
+    }
+  }
+</script>
+
+</body>
+</html>
+
