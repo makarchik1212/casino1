@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Выберите игру</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-image: url('https://cdn.pixabay.com/photo/2013/07/18/10/56/stars-164550_960_720.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+    h1 {
+      margin-bottom: 30px;
+    }
+    .game-cards {
+      display: flex;
+      gap: 40px;
+    }
+    .card {
+      background: #1c1c2e;
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+      width: 200px;
+      box-shadow: 0 0 15px #00f5ff80;
+    }
+    .card img {
+      width: 100px;
+      margin-bottom: 15px;
+    }
+    .card-title {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .btn {
+      padding: 10px 20px;
+      background: #e63946;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+    }
+    .btn:hover {
+      background: #d62839;
+    }
+  </style>
+</head>
+<body>
+  <h1>Выберите игру:</h1>
+  <div class="game-cards">
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/616/616489.png" alt="Crash Game">
+      <div class="card-title">Crash Game</div>
+      <a class="btn" href="crash.html">Играть</a>
+    </div>
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" alt="Mines Game">
+      <div class="card-title">Mines Game</div>
+      <a class="btn" href="#">Играть</a>
+    </div>
+  </div>
+</body>
+</html>
